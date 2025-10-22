@@ -169,13 +169,13 @@ const client = new SwiftAPI({
 
 // Test the connection
 const user = await client.getCurrentUser();
-console.log(\`Connected as: \${'${user.email}'}\`);
-console.log(\`Current tier: \${'${user.tier}'}\`);
+console.log(\`Connected as: \$\{user.email\}\`);
+console.log(\`Current tier: \$\{user.tier\}\`);
 
 // Check your usage
 const usage = await client.getUsage();
-console.log(\`API calls this month: \${'${usage.calls.month}'}\`);
-console.log(\`Rate limit: \${'${usage.rate_limits.minute_remaining}'} calls/min\`);`}</code>
+console.log(\`API calls this month: \$\{usage.calls.month\}\`);
+console.log(\`Rate limit: \$\{usage.rate_limits.minute_remaining\} calls/min\`);`}</code>
               </pre>
             </div>
           </div>
