@@ -1,0 +1,44 @@
+
+> swiftapi@1.0.0 build C:\Users\Rayan Pal\Dropbox\My PC (LAPTOP-ATIQT65L)\Desktop\swiftapi
+> turbo run build
+
+turbo 2.5.8
+
+• Packages in scope: web
+• Running build in 1 packages
+• Remote caching disabled
+web:build: cache miss, executing a38156ebe032fd42
+web:build: 
+web:build: > web@0.1.0 build C:\Users\Rayan Pal\Dropbox\My PC (LAPTOP-ATIQT65L)\Desktop\swiftapi\apps\web
+web:build: > next build
+web:build: 
+web:build:   ▲ Next.js 14.2.33
+web:build:   - Environments: .env.local, .env
+web:build: 
+web:build:    Creating an optimized production build ...
+web:build:  ✓ Compiled successfully
+web:build:    Linting and checking validity of types ...
+web:build: Failed to compile.
+web:build: 
+web:build: ./app/api/stripe/webhook/route.ts:45:53
+web:build: Type error: Property 'current_period_end' does not exist on type 'Response<Subscription>'.
+web:build: 
+web:build: [0m [90m 43 |[39m             status[33m:[39m subscription[33m.[39mstatus[33m,[39m[0m
+web:build: [0m [90m 44 |[39m             priceId[33m:[39m subscription[33m.[39mitems[33m.[39mdata[[35m0[39m][33m.[39mprice[33m.[39mid[33m,[39m[0m
+web:build: [0m[31m[1m>[22m[39m[90m 45 |[39m             currentPeriodEnd[33m:[39m [36mnew[39m [33mDate[39m(subscription[33m.[39mcurrent_period_end [33m*[39m [35m1000[39m)[33m,[39m[0m
+web:build: [0m [90m    |[39m                                                     [31m[1m^[22m[39m[0m
+web:build: [0m [90m 46 |[39m           }[33m,[39m[0m
+web:build: [0m [90m 47 |[39m           update[33m:[39m {[0m
+web:build: [0m [90m 48 |[39m             status[33m:[39m subscription[33m.[39mstatus[33m,[39m[0m
+web:build: Next.js build worker exited with code: 1 and signal: null
+web:build:  ELIFECYCLE  Command failed with exit code 1.
+web:build: ERROR: command finished with error: command (C:\Users\Rayan Pal\Dropbox\My PC (LAPTOP-ATIQT65L)\Desktop\swiftapi\apps\web) C:\Users\Rayan Pal\AppData\Local\pnpm\.tools\pnpm\9.15.0\bin\pnpm.CMD run build exited (1)
+web#build: command (C:\Users\Rayan Pal\Dropbox\My PC (LAPTOP-ATIQT65L)\Desktop\swiftapi\apps\web) C:\Users\Rayan Pal\AppData\Local\pnpm\.tools\pnpm\9.15.0\bin\pnpm.CMD run build exited (1)
+
+ Tasks:    0 successful, 1 total
+Cached:    0 cached, 1 total
+  Time:    16.558s 
+Failed:    web#build
+
+ ERROR  run failed: command  exited (1)
+ ELIFECYCLE  Command failed with exit code 1.
