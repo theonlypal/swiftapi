@@ -1,4 +1,4 @@
-import { prisma } from './prisma';
+import { safeDb, isDatabaseAvailable } from './prisma';
 
 // Rate limits per month
 const FREE_MONTHLY_LIMIT = 2;
@@ -8,6 +8,12 @@ export async function checkRateLimit(
   userId: string,
   isPro: boolean = false
 ): Promise<{ ok: boolean; remaining?: number | string }> {
+  // If database is not available, allow limited access
+  if (!isDatabaseAvailable() || !safeDb) {
+    console.warn('Rate limit check skipped - database not available');
+    return { ok: true, remaining: 'Demo mode' };
+  }
+
   // Pro users have unlimited access
   if (isPro) {
     return { ok: true, remaining: 'Unlimited' };
@@ -19,7 +25,7 @@ export async function checkRateLimit(
   monthStart.setHours(0, 0, 0, 0);
 
   // Find or create usage record for current month
-  const usage = await prisma.usage.findUnique({
+  const usage = await safeDb.usage.findUnique({
     where: {
       userId_periodStart: {
         userId,
@@ -37,7 +43,7 @@ export async function checkRateLimit(
   }
 
   // Increment usage count
-  await prisma.usage.upsert({
+  await safeDb.usage.upsert({
     where: {
       userId_periodStart: {
         userId,
@@ -59,6 +65,19 @@ export async function checkRateLimit(
 
 // Helper function to get current usage without incrementing
 export async function getUsageInfo(userId: string, isPro: boolean = false) {
+  // If database is not available, return demo data
+  if (!isDatabaseAvailable() || !safeDb) {
+    const now = new Date();
+    const resetDate = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    return {
+      count: 0,
+      limit: FREE_MONTHLY_LIMIT,
+      remaining: FREE_MONTHLY_LIMIT,
+      resetDate,
+      demoMode: true,
+    };
+  }
+
   if (isPro) {
     return {
       count: 0,
@@ -72,7 +91,7 @@ export async function getUsageInfo(userId: string, isPro: boolean = false) {
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   monthStart.setHours(0, 0, 0, 0);
 
-  const usage = await prisma.usage.findUnique({
+  const usage = await safeDb.usage.findUnique({
     where: {
       userId_periodStart: {
         userId,

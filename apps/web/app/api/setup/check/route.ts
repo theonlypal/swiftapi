@@ -3,11 +3,11 @@ import { NextResponse } from 'next/server';
 // Critical vars - app won't work without these
 const CRITICAL_ENV_VARS = [
   'NEXTAUTH_SECRET',
-  'DATABASE_URL',
 ];
 
 // Optional vars - features will be disabled but app still works
 const OPTIONAL_ENV_VARS = [
+  'DATABASE_URL',
   'STRIPE_SECRET_KEY',
   'STRIPE_PRICE_ID',
   'STRIPE_WEBHOOK_SECRET',

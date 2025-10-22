@@ -2,10 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { stripe, STRIPE_CONFIG, isStripeConfigured } from '@/lib/stripe';
-import { prisma } from '@/lib/prisma';
+import { safeDb, isDatabaseAvailable } from '@/lib/prisma';
 
 export async function POST(req: NextRequest) {
   try {
+    // Check if database is available
+    if (!isDatabaseAvailable() || !safeDb) {
+      return NextResponse.json(
+        { error: 'Billing features require database. Please configure DATABASE_URL environment variable.' },
+        { status: 503 }
+      );
+    }
+
     // Check if Stripe is configured
     if (!isStripeConfigured || !stripe) {
       return NextResponse.json(
@@ -23,7 +31,7 @@ export async function POST(req: NextRequest) {
     const userEmail = session.user.email;
 
     // Check if user already has an active subscription
-    const existingSubscription = await prisma.subscription.findUnique({
+    const existingSubscription = await safeDb.subscription.findUnique({
       where: { userId },
     });
 
@@ -84,7 +92,7 @@ export async function POST(req: NextRequest) {
 
     // Store customer ID if it's new
     if (existingSubscription && !existingSubscription.customerId) {
-      await prisma.subscription.update({
+      await safeDb.subscription.update({
         where: { userId },
         data: { customerId },
       });

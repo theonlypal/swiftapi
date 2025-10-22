@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { safeDb, isDatabaseAvailable } from '@/lib/prisma';
 import { z } from 'zod';
 
 const JobSchema = z.object({
@@ -18,6 +18,18 @@ const JobSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+    // Check if database is available
+    if (!isDatabaseAvailable() || !safeDb) {
+      return NextResponse.json(
+        {
+          error: 'Database not configured',
+          message: 'Job creation requires database. Please configure DATABASE_URL environment variable.',
+          demoMode: true
+        },
+        { status: 503 }
+      );
+    }
+
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -27,12 +39,12 @@ export async function POST(req: NextRequest) {
     const validated = JobSchema.parse(body);
 
     // Check subscription limits
-    const subscription = await prisma.subscription.findUnique({
+    const subscription = await safeDb.subscription.findUnique({
       where: { userId: session.user.id },
     });
     const isPro = subscription?.status === 'active';
 
-    const jobCount = await prisma.job.count({
+    const jobCount = await safeDb.job.count({
       where: { userId: session.user.id },
     });
 
@@ -56,7 +68,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Note: Headers and body stored as JSON. Production systems should encrypt sensitive data.
-    const job = await prisma.job.create({
+    const job = await safeDb.job.create({
       data: {
         userId: session.user.id,
         name: validated.name,
@@ -83,12 +95,25 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   try {
+    // Check if database is available
+    if (!isDatabaseAvailable() || !safeDb) {
+      return NextResponse.json(
+        [],
+        {
+          headers: {
+            'X-Demo-Mode': 'true',
+            'X-Database-Status': 'unavailable'
+          }
+        }
+      );
+    }
+
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const jobs = await prisma.job.findMany({
+    const jobs = await safeDb.job.findMany({
       where: { userId: session.user.id },
       include: {
         runs: {

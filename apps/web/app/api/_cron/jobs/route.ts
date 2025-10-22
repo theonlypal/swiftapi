@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { safeDb, isDatabaseAvailable } from '@/lib/prisma';
 import { evaluate } from '@/lib/jsonpath';
 import { sendAlert } from '@/lib/alerts';
 
@@ -12,9 +12,20 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    // Check if database is available
+    if (!isDatabaseAvailable() || !safeDb) {
+      console.warn('[Cron] Database not configured - skipping job execution');
+      return NextResponse.json({
+        executed: 0,
+        results: [],
+        message: 'Database not configured - no jobs to execute',
+        demoMode: true
+      });
+    }
+
     // Select jobs to run based on schedule
     const now = new Date();
-    const jobs = await prisma.job.findMany({
+    const jobs = await safeDb.job.findMany({
       where: { paused: false },
       include: {
         runs: {
@@ -99,21 +110,24 @@ async function runJob(job: any) {
 
   const durationMs = Date.now() - start;
 
-  const jobRun = await prisma.jobRun.create({
-    data: {
-      jobId: job.id,
-      durationMs,
-      statusCode,
-      ok,
-      errorMsg,
-      sampleBody,
-    },
-  });
+  // Only create job run if database is available
+  if (safeDb) {
+    const jobRun = await safeDb.jobRun.create({
+      data: {
+        jobId: job.id,
+        durationMs,
+        statusCode,
+        ok,
+        errorMsg,
+        sampleBody,
+      },
+    });
 
-  if (!ok) {
-    await sendAlert(
-      `[ALERT] Job *${job.name}* failed!\nStatus: ${statusCode}\nError: ${errorMsg || 'Check conditions'}`
-    );
+    if (!ok) {
+      await sendAlert(
+        `[ALERT] Job *${job.name}* failed!\nStatus: ${statusCode}\nError: ${errorMsg || 'Check conditions'}`
+      );
+    }
   }
 
   return { jobId: job.id, ok, durationMs };

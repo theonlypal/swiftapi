@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { safeDb, isDatabaseAvailable } from '@/lib/prisma';
 import { stripe, isStripeConfigured } from '@/lib/stripe';
 
 export async function GET(req: NextRequest) {
@@ -14,8 +14,38 @@ export async function GET(req: NextRequest) {
 
     const userId = session.user.id;
 
+    // If database is not available, return demo mode data
+    if (!isDatabaseAvailable() || !safeDb) {
+      const now = new Date();
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+      monthStart.setHours(0, 0, 0, 0);
+
+      return NextResponse.json({
+        user: {
+          id: session.user.id,
+          name: session.user.name || 'Demo User',
+          email: session.user.email || 'demo@example.com',
+          image: session.user.image || null,
+          createdAt: new Date(),
+        },
+        subscription: {
+          plan: 'Free',
+          status: 'inactive',
+          currentPeriodEnd: null,
+        },
+        usage: {
+          count: 0,
+          limit: 2,
+          remaining: 2,
+          periodStart: monthStart,
+        },
+        billingPortalUrl: null,
+        demoMode: true,
+      });
+    }
+
     // Fetch user data
-    const user = await prisma.user.findUnique({
+    const user = await safeDb.user.findUnique({
       where: { id: userId },
       select: {
         id: true,
@@ -31,7 +61,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Fetch subscription data
-    const subscription = await prisma.subscription.findUnique({
+    const subscription = await safeDb.subscription.findUnique({
       where: { userId },
     });
 
@@ -44,7 +74,7 @@ export async function GET(req: NextRequest) {
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
     monthStart.setHours(0, 0, 0, 0);
 
-    const usage = await prisma.usage.findFirst({
+    const usage = await safeDb.usage.findFirst({
       where: {
         userId,
         periodStart: {

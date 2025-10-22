@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { safeDb, isDatabaseAvailable } from '@/lib/prisma';
 import { evaluate } from '@/lib/jsonpath';
 import { sendAlert } from '@/lib/alerts';
 
@@ -10,12 +10,24 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
+    // Check if database is available
+    if (!isDatabaseAvailable() || !safeDb) {
+      return NextResponse.json(
+        {
+          error: 'Database not configured',
+          message: 'Job execution requires database. Please configure DATABASE_URL environment variable.',
+          demoMode: true
+        },
+        { status: 503 }
+      );
+    }
+
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const job = await prisma.job.findUnique({
+    const job = await safeDb.job.findUnique({
       where: { id: params.id, userId: session.user.id },
     });
 
@@ -63,7 +75,7 @@ export async function POST(
 
     const durationMs = Date.now() - start;
 
-    const jobRun = await prisma.jobRun.create({
+    const jobRun = await safeDb.jobRun.create({
       data: {
         jobId: job.id,
         durationMs,

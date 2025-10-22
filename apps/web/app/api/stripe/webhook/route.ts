@@ -1,9 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe, STRIPE_CONFIG, isStripeConfigured } from '@/lib/stripe';
-import { prisma } from '@/lib/prisma';
+import { safeDb, isDatabaseAvailable } from '@/lib/prisma';
 import Stripe from 'stripe';
 
 export async function POST(req: NextRequest) {
+  // Check if database is available
+  if (!isDatabaseAvailable() || !safeDb) {
+    console.warn('Webhook error: Database is not configured');
+    return NextResponse.json(
+      { error: 'Stripe webhooks require database. Please configure DATABASE_URL environment variable.' },
+      { status: 503 }
+    );
+  }
+
   // Check if Stripe is configured
   if (!isStripeConfigured || !stripe) {
     console.error('Webhook error: Stripe is not configured');
@@ -55,7 +64,7 @@ export async function POST(req: NextRequest) {
         console.log(`Creating subscription for user ${userId}`);
 
         // Create or update subscription record
-        await prisma.subscription.upsert({
+        await safeDb!.subscription.upsert({
           where: { userId },
           create: {
             userId,
@@ -84,12 +93,12 @@ export async function POST(req: NextRequest) {
 
         if (!userId) {
           // Try to find user by subscription ID
-          const existingSubscription = await prisma.subscription.findUnique({
+          const existingSubscription = await safeDb!.subscription.findUnique({
             where: { subscriptionId: subscription.id },
           });
 
           if (existingSubscription) {
-            await prisma.subscription.update({
+            await safeDb!.subscription.update({
               where: { id: existingSubscription.id },
               data: {
                 status: subscription.status,
@@ -104,7 +113,7 @@ export async function POST(req: NextRequest) {
           break;
         }
 
-        await prisma.subscription.update({
+        await safeDb!.subscription.update({
           where: { userId },
           data: {
             status: subscription.status,
@@ -123,12 +132,12 @@ export async function POST(req: NextRequest) {
 
         if (!userId) {
           // Try to find user by subscription ID
-          const existingSubscription = await prisma.subscription.findUnique({
+          const existingSubscription = await safeDb!.subscription.findUnique({
             where: { subscriptionId: subscription.id },
           });
 
           if (existingSubscription) {
-            await prisma.subscription.update({
+            await safeDb!.subscription.update({
               where: { id: existingSubscription.id },
               data: {
                 status: 'canceled',
@@ -143,7 +152,7 @@ export async function POST(req: NextRequest) {
         }
 
         // Update subscription to canceled status (downgrade to free)
-        await prisma.subscription.update({
+        await safeDb!.subscription.update({
           where: { userId },
           data: {
             status: 'canceled',
@@ -161,12 +170,12 @@ export async function POST(req: NextRequest) {
 
         if (subscriptionId) {
           // Find subscription and ensure status is active
-          const existingSubscription = await prisma.subscription.findUnique({
+          const existingSubscription = await safeDb!.subscription.findUnique({
             where: { subscriptionId },
           });
 
           if (existingSubscription) {
-            await prisma.subscription.update({
+            await safeDb!.subscription.update({
               where: { id: existingSubscription.id },
               data: { status: 'active' },
             });
@@ -182,12 +191,12 @@ export async function POST(req: NextRequest) {
 
         if (subscriptionId) {
           // Find subscription and mark as past_due
-          const existingSubscription = await prisma.subscription.findUnique({
+          const existingSubscription = await safeDb!.subscription.findUnique({
             where: { subscriptionId },
           });
 
           if (existingSubscription) {
-            await prisma.subscription.update({
+            await safeDb!.subscription.update({
               where: { id: existingSubscription.id },
               data: { status: 'past_due' },
             });

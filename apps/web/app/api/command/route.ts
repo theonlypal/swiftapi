@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { safeDb, isDatabaseAvailable } from '@/lib/prisma';
 import { z } from 'zod';
 import { executeCommand, getExecutorConfigFromEnv, isGitHubConfigured } from '@/lib/executor';
 import { checkRateLimit } from '@/lib/rate';
@@ -17,6 +17,18 @@ const CommandSchema = z.object({
  */
 export async function POST(req: NextRequest) {
   try {
+    // Check if database is available
+    if (!isDatabaseAvailable() || !safeDb) {
+      return NextResponse.json(
+        {
+          error: 'Database not configured',
+          message: 'Command execution requires database. Please configure DATABASE_URL environment variable.',
+          demoMode: true
+        },
+        { status: 503 }
+      );
+    }
+
     // Check if GitHub is configured for command execution
     if (!isGitHubConfigured()) {
       return NextResponse.json(
@@ -36,7 +48,7 @@ export async function POST(req: NextRequest) {
     const userId = session.user.id;
 
     // Check subscription status
-    const subscription = await prisma.subscription.findUnique({
+    const subscription = await safeDb.subscription.findUnique({
       where: { userId },
     });
     const isPro = subscription?.status === 'active';
@@ -59,7 +71,7 @@ export async function POST(req: NextRequest) {
     const validated = CommandSchema.parse(body);
 
     // Create command record
-    const command = await prisma.command.create({
+    const command = await safeDb.command.create({
       data: {
         userId: session.user.id,
         commandText: validated.commandText,

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { safeDb, isDatabaseAvailable } from '@/lib/prisma';
 import { createSSEStream } from '@/lib/sse';
 
 /**
@@ -13,6 +13,18 @@ export async function GET(
   { params }: { params: { jobId: string } }
 ) {
   try {
+    // Check if database is available
+    if (!isDatabaseAvailable() || !safeDb) {
+      return NextResponse.json(
+        {
+          error: 'Database not configured',
+          message: 'Log streaming requires database. Please configure DATABASE_URL environment variable.',
+          demoMode: true
+        },
+        { status: 503 }
+      );
+    }
+
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -21,7 +33,7 @@ export async function GET(
     const { jobId } = params;
 
     // Verify command exists and user has access
-    const command = await prisma.command.findUnique({
+    const command = await safeDb.command.findUnique({
       where: { id: jobId },
       select: { userId: true, status: true },
     });

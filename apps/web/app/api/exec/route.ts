@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { checkRateLimit } from '@/lib/rate';
-import { prisma } from '@/lib/prisma';
+import { safeDb, isDatabaseAvailable } from '@/lib/prisma';
 import { z } from 'zod';
 
 const ExecSchema = z.object({
@@ -14,6 +14,18 @@ const ExecSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+    // Check if database is available
+    if (!isDatabaseAvailable() || !safeDb) {
+      return NextResponse.json(
+        {
+          error: 'Database not configured',
+          message: 'API execution requires database. Please configure DATABASE_URL environment variable.',
+          demoMode: true
+        },
+        { status: 503 }
+      );
+    }
+
     // Auth via session or API key
     const session = await getServerSession(authOptions);
     const authHeader = req.headers.get('authorization');
@@ -25,7 +37,7 @@ export async function POST(req: NextRequest) {
     } else if (authHeader?.startsWith('Bearer ')) {
       const token = authHeader.substring(7);
       // API key validation. Production systems should use bcrypt or similar hashing.
-      const apiKey = await prisma.apiKey.findFirst({
+      const apiKey = await safeDb.apiKey.findFirst({
         where: { keyHash: token },
       });
       if (apiKey) {
@@ -38,7 +50,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Check subscription
-    const subscription = await prisma.subscription.findUnique({
+    const subscription = await safeDb.subscription.findUnique({
       where: { userId },
     });
     isPro = subscription?.status === 'active';

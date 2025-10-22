@@ -12,11 +12,11 @@ interface EnvCheck {
 // CRITICAL: App won't work at all without these
 const CRITICAL_ENV_VARS = [
   { key: 'NEXTAUTH_SECRET', description: 'NextAuth.js secret for session encryption - authentication will fail' },
-  { key: 'DATABASE_URL', description: 'Database connection string - database operations will fail' },
 ];
 
 // OPTIONAL: Features will be disabled but app still works
 const OPTIONAL_ENV_VARS = [
+  { key: 'DATABASE_URL', description: 'Database connection string - app will run in demo mode without database' },
   { key: 'STRIPE_SECRET_KEY', description: 'Stripe secret key - billing features will be disabled' },
   { key: 'STRIPE_PRICE_ID', description: 'Stripe price ID - subscriptions will be unavailable' },
   { key: 'STRIPE_WEBHOOK_SECRET', description: 'Stripe webhook secret - webhook processing will be disabled' },
