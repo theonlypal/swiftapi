@@ -10,8 +10,8 @@ export async function JobsListMobile() {
 
   if (jobs.length === 0) {
     return (
-      <div className="text-center py-12 text-gray-500">
-        <p>No jobs yet. Create one from the dashboard!</p>
+      <div className="text-center py-12 text-neutral-500">
+        <p>No executions yet.</p>
       </div>
     );
   }

@@ -20,6 +20,7 @@ model User {
   usage         Usage[]
   apiKeys       ApiKey[]
   pats          Pat[]
+  commands      Command[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
@@ -95,12 +96,48 @@ model JobRun {
   ok         Boolean
   errorMsg   String?
   sampleBody String?
+  commitUrl  String?
+  prUrl      String?
+  deployUrl  String?
   job        Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+}
+
+model Command {
+  id          String         @id @default(cuid())
+  userId      String
+  commandText String
+  dryRun      Boolean        @default(false)
+  status      String         @default("pending")
+  commitUrl   String?
+  prUrl       String?
+  deployUrl   String?
+  createdAt   DateTime       @default(now())
+  completedAt DateTime?
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  phases      CommandPhase[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+model CommandPhase {
+  id          String    @id @default(cuid())
+  commandId   String
+  name        String
+  status      String    @default("pending")
+  startedAt   DateTime?
+  completedAt DateTime?
+  logs        String?
+  command     Command   @relation(fields: [commandId], references: [id], onDelete: Cascade)
+
+  @@index([commandId])
 }
 
 model Subscription {
   id               String    @id @default(cuid())
   userId           String
+  customerId       String?   @unique
+  subscriptionId   String?   @unique
   status           String
   priceId          String
   currentPeriodEnd DateTime?
@@ -109,6 +146,8 @@ model Subscription {
   user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId])
+  @@index([customerId])
+  @@index([subscriptionId])
 }
 
 model Usage {

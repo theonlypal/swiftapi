@@ -1,21 +1,11 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import "./globals.css";
-
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
+import { SetupGuard } from "@/components/SetupGuard";
+import { geistSans, geistMono, displayFont } from "./fonts";
 
 export const metadata: Metadata = {
-  title: "SwiftAPI Jobs - API Monitoring on Autopilot",
-  description: "Schedule API calls, validate responses, get instant alerts.",
+  title: "SwiftAPI - Automate dev tasks from your phone",
+  description: "Type a command. We parse, execute, commit, and deploy.",
 };
 
 export default function RootLayout({
@@ -26,9 +16,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${displayFont.variable} antialiased font-sans`}
       >
-        {children}
+        <SetupGuard>{children}</SetupGuard>
       </body>
     </html>
   );

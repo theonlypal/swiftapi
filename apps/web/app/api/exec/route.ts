@@ -47,8 +47,13 @@ export async function POST(req: NextRequest) {
     const rateCheck = await checkRateLimit(userId, isPro);
     if (!rateCheck.ok) {
       return NextResponse.json(
-        { error: 'Rate limit exceeded', remaining: 0 },
-        { status: 429 }
+        {
+          error: 'Monthly quota exceeded. Upgrade to Pro for unlimited access.',
+          remaining: 0,
+          plan: isPro ? 'Pro' : 'Free',
+          upgradeUrl: `${process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXTAUTH_URL}/account`,
+        },
+        { status: 402 } // 402 Payment Required
       );
     }
 

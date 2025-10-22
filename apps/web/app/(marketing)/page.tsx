@@ -1,93 +1,64 @@
-import { HeroDemo } from '@/components/HeroDemo';
-import { Check } from 'lucide-react';
+import Link from 'next/link';
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      <nav className="py-6 px-8 flex justify-between items-center">
-        <div className="text-2xl font-bold">SwiftAPI Jobs</div>
-        <a
-          href="/api/auth/signin"
-          className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
-        >
-          Start Free
-        </a>
+    <div className="min-h-screen bg-white">
+      <nav className="border-b border-neutral-200">
+        <div className="max-w-6xl mx-auto px-8 py-4 flex justify-between items-center">
+          <div className="text-xl font-semibold text-neutral-900">SwiftAPI</div>
+          <div className="flex gap-6 items-center">
+            <Link href="/pricing" className="text-neutral-600 hover:text-neutral-900">
+              Pricing
+            </Link>
+            <Link
+              href="/m"
+              className="bg-neutral-900 text-white px-5 py-2 rounded hover:bg-neutral-800"
+            >
+              Try Free
+            </Link>
+          </div>
+        </div>
       </nav>
 
-      <main className="max-w-6xl mx-auto px-8 py-16">
-        <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold mb-6">
-            Monitor Your APIs
-            <br />
-            <span className="text-blue-600">On Autopilot</span>
+      <main className="max-w-4xl mx-auto px-8 py-24">
+        <div className="text-center mb-16">
+          <h1 className="font-display text-6xl font-bold mb-6 text-neutral-900 leading-tight">
+            Automate senior-level dev tasks from your phone.
           </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Schedule API calls, validate responses, get instant alerts.
-            Perfect for monitoring webhooks, health checks, and data pipelines.
+          <p className="text-xl text-neutral-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+            Type a command. We parse, execute, commit, and deploy.
           </p>
-          <a
-            href="/api/auth/signin"
-            className="inline-block bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700"
-          >
-            Start Monitoring Free
-          </a>
-        </div>
-
-        <HeroDemo />
-
-        <div className="grid md:grid-cols-2 gap-8 mt-20">
-          <div className="bg-white p-8 rounded-lg shadow">
-            <h2 className="text-2xl font-bold mb-4">Free</h2>
-            <div className="text-4xl font-bold mb-6">$0<span className="text-lg text-gray-500">/mo</span></div>
-            <ul className="space-y-3 mb-6">
-              <li className="flex items-center gap-2">
-                <Check size={20} className="text-green-500" />
-                <span>1 Job</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Check size={20} className="text-green-500" />
-                <span>15-minute intervals</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Check size={20} className="text-green-500" />
-                <span>7-day logs</span>
-              </li>
-            </ul>
-            <a
-              href="/api/auth/signin"
-              className="block text-center bg-gray-100 text-gray-900 py-3 rounded-lg hover:bg-gray-200"
+          <div className="flex gap-4 justify-center mb-12">
+            <Link
+              href="/m"
+              className="bg-neutral-900 text-white px-8 py-4 rounded text-lg font-medium hover:bg-neutral-800"
             >
-              Get Started
-            </a>
+              Try Free
+            </Link>
+            <Link
+              href="/pricing"
+              className="bg-white text-neutral-900 px-8 py-4 rounded text-lg font-medium border border-neutral-300 hover:border-neutral-400"
+            >
+              Pricing
+            </Link>
           </div>
-
-          <div className="bg-gradient-to-br from-blue-600 to-purple-600 p-8 rounded-lg shadow text-white">
-            <h2 className="text-2xl font-bold mb-4">Pro</h2>
-            <div className="text-4xl font-bold mb-6">$19<span className="text-lg opacity-75">/mo</span></div>
-            <ul className="space-y-3 mb-6">
-              <li className="flex items-center gap-2">
-                <Check size={20} />
-                <span>20 Jobs</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Check size={20} />
-                <span>1-minute intervals</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Check size={20} />
-                <span>90-day logs</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Check size={20} />
-                <span>Telegram alerts</span>
-              </li>
-            </ul>
-            <a
-              href="/api/auth/signin"
-              className="block text-center bg-white text-blue-600 py-3 rounded-lg hover:bg-gray-100 font-semibold"
-            >
-              Start Pro Trial
-            </a>
+          <div className="flex flex-wrap gap-8 justify-center text-sm text-neutral-600">
+            <div className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 bg-neutral-900 rounded-full"></span>
+              <span>Production deploys</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 bg-neutral-900 rounded-full"></span>
+              <span>Billing</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 bg-neutral-900 rounded-full"></span>
+              <span>Repo PR/commit</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 bg-neutral-900 rounded-full"></span>
+              <span>Live logs</span>
+            </div>
           </div>
         </div>
       </main>
