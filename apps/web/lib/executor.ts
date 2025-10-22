@@ -320,6 +320,18 @@ async function triggerVercelDeploy(
 }
 
 /**
+ * Check if GitHub environment variables are configured for command execution
+ */
+export function isGitHubConfigured(): boolean {
+  return !!(
+    process.env.GITHUB_TOKEN &&
+    process.env.GITHUB_OWNER &&
+    process.env.GITHUB_REPO &&
+    process.env.GITHUB_BRANCH
+  );
+}
+
+/**
  * Get executor config from environment variables
  */
 export function getExecutorConfigFromEnv(): ExecutorConfig {

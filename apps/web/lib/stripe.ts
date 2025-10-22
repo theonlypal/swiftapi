@@ -1,19 +1,26 @@
 import Stripe from 'stripe';
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('STRIPE_SECRET_KEY is not defined in environment variables');
-}
+// Check if Stripe is configured
+export const isStripeConfigured = !!(
+  process.env.STRIPE_SECRET_KEY &&
+  process.env.STRIPE_PRICE_ID &&
+  process.env.STRIPE_WEBHOOK_SECRET
+);
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2025-09-30.clover',
-  typescript: true,
-  appInfo: {
-    name: 'SwiftAPI',
-    version: '1.0.0',
-    url: 'https://swiftapi.dev',
-  },
-  maxNetworkRetries: 2,
-});
+// Only initialize Stripe if configured, otherwise set to null
+// This allows the app to run without Stripe, just with billing features disabled
+export const stripe = isStripeConfigured
+  ? new Stripe(process.env.STRIPE_SECRET_KEY!, {
+      apiVersion: '2025-09-30.clover',
+      typescript: true,
+      appInfo: {
+        name: 'SwiftAPI',
+        version: '1.0.0',
+        url: 'https://swiftapi.dev',
+      },
+      maxNetworkRetries: 2,
+    })
+  : null;
 
 // Stripe configuration constants
 export const STRIPE_CONFIG = {

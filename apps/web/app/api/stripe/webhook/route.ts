@@ -1,9 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { stripe, STRIPE_CONFIG } from '@/lib/stripe';
+import { stripe, STRIPE_CONFIG, isStripeConfigured } from '@/lib/stripe';
 import { prisma } from '@/lib/prisma';
 import Stripe from 'stripe';
 
 export async function POST(req: NextRequest) {
+  // Check if Stripe is configured
+  if (!isStripeConfigured || !stripe) {
+    console.error('Webhook error: Stripe is not configured');
+    return NextResponse.json(
+      { error: 'Stripe webhooks are disabled. Stripe environment variables are not configured.' },
+      { status: 503 }
+    );
+  }
+
   const body = await req.text();
   const signature = req.headers.get('stripe-signature');
 

@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
-import { executeCommand, getExecutorConfigFromEnv } from '@/lib/executor';
+import { executeCommand, getExecutorConfigFromEnv, isGitHubConfigured } from '@/lib/executor';
 import { checkRateLimit } from '@/lib/rate';
 
 const CommandSchema = z.object({
@@ -17,6 +17,17 @@ const CommandSchema = z.object({
  */
 export async function POST(req: NextRequest) {
   try {
+    // Check if GitHub is configured for command execution
+    if (!isGitHubConfigured()) {
+      return NextResponse.json(
+        {
+          error: 'Command execution is disabled. GitHub environment variables (GITHUB_TOKEN, GITHUB_OWNER, GITHUB_REPO, GITHUB_BRANCH) are not configured.',
+          disabled: true
+        },
+        { status: 503 }
+      );
+    }
+
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

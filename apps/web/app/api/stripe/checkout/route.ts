@@ -1,11 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { stripe, STRIPE_CONFIG } from '@/lib/stripe';
+import { stripe, STRIPE_CONFIG, isStripeConfigured } from '@/lib/stripe';
 import { prisma } from '@/lib/prisma';
 
 export async function POST(req: NextRequest) {
   try {
+    // Check if Stripe is configured
+    if (!isStripeConfigured || !stripe) {
+      return NextResponse.json(
+        { error: 'Billing features are disabled. Stripe environment variables are not configured.' },
+        { status: 503 }
+      );
+    }
+
     const session = await getServerSession(authOptions);
     if (!session?.user?.id || !session.user.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

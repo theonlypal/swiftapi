@@ -1,7 +1,13 @@
 import { NextResponse } from 'next/server';
 
-const REQUIRED_ENV_VARS = [
+// Critical vars - app won't work without these
+const CRITICAL_ENV_VARS = [
   'NEXTAUTH_SECRET',
+  'DATABASE_URL',
+];
+
+// Optional vars - features will be disabled but app still works
+const OPTIONAL_ENV_VARS = [
   'STRIPE_SECRET_KEY',
   'STRIPE_PRICE_ID',
   'STRIPE_WEBHOOK_SECRET',
@@ -15,16 +21,21 @@ const REQUIRED_ENV_VARS = [
 export async function GET() {
   const env: Record<string, boolean> = {};
 
-  for (const key of REQUIRED_ENV_VARS) {
+  // Check all vars (critical + optional)
+  const allVars = [...CRITICAL_ENV_VARS, ...OPTIONAL_ENV_VARS];
+
+  for (const key of allVars) {
     // Check if the environment variable exists and is not empty
     env[key] = !!(process.env[key] && process.env[key].trim() !== '');
   }
 
   const allPresent = Object.values(env).every(present => present);
+  const criticalPresent = CRITICAL_ENV_VARS.every(key => env[key]);
 
   return NextResponse.json({
     env,
     allPresent,
+    criticalPresent,
     timestamp: new Date().toISOString(),
   });
 }

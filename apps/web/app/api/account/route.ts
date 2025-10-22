@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { stripe } from '@/lib/stripe';
+import { stripe, isStripeConfigured } from '@/lib/stripe';
 
 export async function GET(req: NextRequest) {
   try {
@@ -62,7 +62,7 @@ export async function GET(req: NextRequest) {
     // Generate billing portal URL if user has a Stripe customer ID
     let billingPortalUrl: string | null = null;
 
-    if (subscription?.customerId) {
+    if (subscription?.customerId && isStripeConfigured && stripe) {
       try {
         const portalSession = await stripe.billingPortal.sessions.create({
           customer: subscription.customerId,
