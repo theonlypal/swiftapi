@@ -147,13 +147,13 @@ client = SwiftAPI(api_key="sk_your_api_key_here")
 
 # Test the connection
 user = client.get_current_user()
-print(f"Connected as: {user.email}")
-print(f"Current tier: {user.tier}")
+print(f"Connected as: ${'{'} user.email ${'}'}")
+print(f"Current tier: ${'{'} user.tier ${'}'}")
 
 # Check your usage
 usage = client.get_usage()
-print(f"API calls this month: {usage.calls.month}")
-print(f"Rate limit: {usage.rate_limits.minute_remaining} calls/min remaining")`}</code>
+print(f"API calls this month: ${'{'} usage.calls.month ${'}'}")
+print(f"Rate limit: ${'{'} usage.rate_limits.minute_remaining ${'}'} calls/min remaining")`}</code>
               </pre>
             </div>
 
@@ -197,18 +197,14 @@ console.log(\`Rate limit: \$\{usage.rate_limits.minute_remaining\} calls/min\`);
 transaction = client.create_payment(
     amount=9.99,
     currency="usd",
-    metadata={
-        "user_id": "user_123",
-        "service": "ai_analysis",
-        "prompt_tokens": 1500
-    }
+    metadata=${'{'}"user_id": "user_123", "service": "ai_analysis", "prompt_tokens": 1500${'}'}
 )
 
-print(f"Transaction ID: {transaction.id}")
-print(f"Amount charged: ${transaction.amount}")
-print(f"SwiftAPI fee: ${transaction.fee_amount}")
-print(f"You receive: ${transaction.amount - transaction.fee_amount}")
-print(f"Status: {transaction.status}")`}</code>
+print(f"Transaction ID: ${'{'} transaction.id ${'}'}")
+print(f"Amount charged: $${'{'} transaction.amount ${'}'}")
+print(f"SwiftAPI fee: $${'{'} transaction.fee_amount ${'}'}")
+print(f"You receive: $${'{'} transaction.amount - transaction.fee_amount ${'}'}")
+print(f"Status: ${'{'} transaction.status ${'}'}")`}</code>
             </pre>
 
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
