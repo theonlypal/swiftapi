@@ -1,6 +1,20 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": ["**/.env.*local"],
+  "globalEnv": [
+    "NEXTAUTH_URL",
+    "NEXTAUTH_SECRET",
+    "APP_URL",
+    "DATABASE_URL",
+    "GITHUB_ID",
+    "GITHUB_SECRET",
+    "STRIPE_SECRET_KEY",
+    "STRIPE_PRICE_ID",
+    "STRIPE_WEBHOOK_SECRET",
+    "CRON_SECRET",
+    "TELEGRAM_BOT_TOKEN",
+    "TELEGRAM_CHAT_ID"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
