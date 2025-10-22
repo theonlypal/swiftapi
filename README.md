@@ -1,230 +1,323 @@
-# SwiftAPI Jobs
+# SwiftAPI
 
-Production-grade API monitoring service with scheduled execution and automated alerting.
+Unified infrastructure API for AI agents - payments, billing, identity, and usage tracking in one simple API.
 
-## Features
+## Overview
 
-- Scheduled monitoring at 1m, 5m, 15m, or hourly intervals
-- HTTP status validation with JSONPath assertion support
-- Mobile-optimized UI at `/m`
-- Telegram notification integration for failure alerts
-- Stripe-based subscription billing
-- GitHub OAuth authentication via NextAuth.js
+SwiftAPI provides the infrastructure layer that AI agent developers need to monetize their agents and manage users at scale. Built on Stripe, PostgreSQL, and Redis for production-grade reliability.
+
+### Key Features
+
+- **Payment Processing** - Accept payments with 2% fee or $0.05/call (whichever less)
+- **Subscription Billing** - Tiered plans from Free to Enterprise
+- **API Key Management** - Secure authentication for AI agents
+- **Usage Tracking** - Real-time metering and rate limiting
+- **Developer Dashboard** - Monitor usage, manage keys, track revenue
 
 ## Quick Start
 
-### Prerequisites
-
-- Node.js 18+
-- pnpm 9+
-- GitHub OAuth App ([create one](https://github.com/settings/developers))
-- Stripe account (test mode)
-
-### Installation
+### 1. Sign Up
 
 ```bash
-# Clone the repo
-git clone https://github.com/yourusername/swiftapi.git
-cd swiftapi
-
-# Install dependencies
-pnpm install
-
-# Setup environment
-cd apps/web
-cp .env.example .env.local
-
-# Edit .env.local with your keys:
-# - GITHUB_ID & GITHUB_SECRET
-# - STRIPE_SECRET_KEY & STRIPE_PRICE_ID
-# - NEXTAUTH_SECRET (generate with: openssl rand -base64 32)
-
-# Run migrations
-pnpm prisma generate
-pnpm prisma migrate dev
-
-# Start dev server
-cd ../..
-pnpm dev
-```
-
-Visit `http://localhost:3000`
-
-## Environment Variables
-
-```bash
-# Auth
-NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=<generate-random-32-bytes>
-APP_URL=http://localhost:3000
-
-# GitHub OAuth
-GITHUB_ID=<your-github-client-id>
-GITHUB_SECRET=<your-github-client-secret>
-
-# Database
-DATABASE_URL=file:./dev.db  # SQLite for dev, postgres://... for prod
-
-# Stripe
-STRIPE_SECRET_KEY=sk_test_xxx
-STRIPE_WEBHOOK_SECRET=whsec_xxx
-STRIPE_PRICE_ID=price_xxx  # Create a recurring price in Stripe
-
-# Telegram Alerts (optional)
-TELEGRAM_BOT_TOKEN=<your-bot-token>
-TELEGRAM_CHAT_ID=<your-chat-id>
-
-# Cron
-CRON_SECRET=<random-secret>  # For authenticating Vercel Cron
-```
-
-## Stripe Setup
-
-1. Create a product in [Stripe Dashboard](https://dashboard.stripe.com/products)
-2. Add a recurring price (e.g., $19/month)
-3. Copy the `price_xxx` ID to `STRIPE_PRICE_ID`
-4. Setup webhook endpoint: `https://yourapp.com/api/stripe/webhook`
-5. Copy webhook secret to `STRIPE_WEBHOOK_SECRET`
-6. Enable events: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`
-
-## API Examples
-
-### Create a Job
-
-```bash
-curl -X POST http://localhost:3000/api/jobs \
+curl -X POST https://api.getswiftapi.com/auth/signup \
   -H "Content-Type: application/json" \
-  -H "Cookie: next-auth.session-token=<your-session>" \
-  -d '{
-    "name": "httpbin-ok",
-    "url": "https://httpbin.org/status/200",
-    "method": "GET",
-    "schedule": "5m",
-    "expectStatus": 200
-  }'
+  -d '{"email":"you@example.com","password":"secure_password"}'
 ```
 
-### With JSONPath Validation
+### 2. Install SDK
 
+**Python:**
 ```bash
-curl -X POST http://localhost:3000/api/jobs \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "api-health",
-    "url": "https://api.example.com/health",
-    "method": "GET",
-    "schedule": "1m",
-    "expectStatus": 200,
-    "expectJsonPath": "$.status",
-    "expectValue": "ok"
-  }'
+pip install swiftapi
 ```
 
-### Manual Run
-
+**TypeScript:**
 ```bash
-curl -X POST http://localhost:3000/api/jobs/<JOB_ID>/run
+npm install @swiftapi/sdk
 ```
 
-### Exec Proxy (with API key)
+### 3. Make Your First Request
 
-```bash
-curl -X POST http://localhost:3000/api/exec \
-  -H "Authorization: Bearer <API_KEY>" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "url": "https://httpbin.org/post",
-    "method": "POST",
-    "body": {"hello": "world"}
-  }'
+**Python:**
+```python
+from swiftapi import SwiftAPI
+
+client = SwiftAPI(api_key="sk_your_api_key")
+user = client.get_current_user()
+print(f"Tier: {user.tier}")
 ```
+
+**TypeScript:**
+```typescript
+import { SwiftAPI } from '@swiftapi/sdk';
+
+const client = new SwiftAPI({ apiKey: 'sk_your_api_key' });
+const user = await client.getCurrentUser();
+console.log(`Tier: ${user.tier}`);
+```
+
+## Documentation
+
+- [Quick Start Guide](./docs/QUICKSTART.md)
+- [API Reference](./docs/API_REFERENCE.md)
+- [Python SDK](./sdk/python/README.md)
+- [TypeScript SDK](./sdk/typescript/README.md)
 
 ## Pricing
 
-| Feature | Free | Pro ($19/mo) |
-|---------|------|--------------|
-| Jobs | 1 | 20 |
-| Min Interval | 15m | 1m |
-| Logs Retention | 7 days | 90 days |
-| Telegram Alerts | No | Yes |
+| Tier | Price/Month | API Calls | Rate Limit |
+|------|-------------|-----------|------------|
+| Free | $0 | 1,000 | 10/min |
+| Indie | $49 | 10,000 | 100/min |
+| Pro | $199 | 100,000 | 500/min |
+| Enterprise | $999 | Unlimited | 5,000/min |
+
+**Transaction Fees:** 2% or $0.05 per API call (whichever is less)
+
+## Architecture
+
+```
+┌─────────────────┐
+│  Next.js        │  Developer Dashboard
+│  Frontend       │  (React, TailwindCSS)
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│  FastAPI        │  REST API
+│  Backend        │  (Python, Uvicorn)
+└────────┬────────┘
+         │
+         ├────────────────┐
+         │                │
+         ▼                ▼
+┌─────────────┐   ┌─────────────┐
+│ PostgreSQL  │   │   Redis     │
+│ (SQLAlchemy)│   │ (Rate Limit)│
+└─────────────┘   └─────────────┘
+         │
+         ▼
+┌─────────────────┐
+│     Stripe      │  Payment Processing
+│    Connect      │  (2% fee capture)
+└─────────────────┘
+```
+
+## Tech Stack
+
+**Backend:**
+- FastAPI (Python)
+- PostgreSQL (SQLAlchemy ORM)
+- Redis (Rate limiting)
+- Stripe (Payments)
+- JWT (Authentication)
+
+**Frontend:**
+- Next.js 14
+- TypeScript
+- TailwindCSS
+- Recharts (Analytics)
+
+**SDKs:**
+- Python (requests, pydantic)
+- TypeScript (axios)
+
+## Repository Structure
+
+```
+swiftapi/
+├── backend/              # FastAPI backend
+│   ├── main.py          # API endpoints
+│   ├── models.py        # Database models
+│   ├── auth.py          # Authentication
+│   ├── stripe_service.py # Payment processing
+│   ├── rate_limiter.py  # Rate limiting
+│   └── database.py      # Database connection
+├── frontend/            # Next.js frontend
+│   ├── src/
+│   │   ├── pages/      # Dashboard pages
+│   │   ├── components/ # React components
+│   │   ├── lib/        # API client
+│   │   └── types/      # TypeScript types
+│   └── package.json
+├── sdk/
+│   ├── python/         # Python SDK
+│   └── typescript/     # TypeScript SDK
+└── docs/               # Documentation
+    ├── API_REFERENCE.md
+    └── QUICKSTART.md
+```
+
+## Development
+
+### Backend Setup
+
+```bash
+cd backend
+pip install -r requirements.txt
+cp .env.example .env
+# Configure DATABASE_URL, STRIPE_SECRET_KEY, etc.
+uvicorn main:app --reload
+```
+
+### Frontend Setup
+
+```bash
+cd frontend
+npm install
+cp .env.example .env.local
+npm run dev
+```
+
+### Environment Variables
+
+**Backend (.env):**
+```bash
+DATABASE_URL=postgresql://user:password@localhost:5432/swiftapi
+REDIS_URL=redis://localhost:6379
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+SECRET_KEY=your-secret-key-here
+```
+
+**Frontend (.env.local):**
+```bash
+NEXT_PUBLIC_API_URL=http://localhost:8000
+```
 
 ## Deployment
 
 ### Vercel (Recommended)
 
+**Frontend:**
 ```bash
-# Install Vercel CLI
-pnpm add -g vercel
-
-# Link project
-vercel link
-
-# Set environment variables
-vercel env add NEXTAUTH_SECRET
-vercel env add GITHUB_ID
-vercel env add GITHUB_SECRET
-vercel env add STRIPE_SECRET_KEY
-vercel env add STRIPE_WEBHOOK_SECRET
-vercel env add STRIPE_PRICE_ID
-vercel env add DATABASE_URL  # Use Vercel Postgres or other hosted DB
-
-# Deploy
 vercel --prod
 ```
 
-### Setup Vercel Cron
+**Backend:**
+Deploy to any Python-compatible platform:
+- Railway
+- Render
+- Fly.io
+- AWS Lambda (with Mangum)
 
-In `vercel.json`:
+### Domain Configuration
 
-```json
-{
-  "crons": [
-    {
-      "path": "/api/_cron/jobs",
-      "schedule": "* * * * *"
-    }
-  ]
-}
+- Primary: getswiftapi.com
+- API: api.getswiftapi.com
+- Alternative: swiftapi.ai
+
+## API Endpoints
+
+### Authentication
+- `POST /auth/signup` - Create account
+- `POST /auth/login` - Get access token
+- `GET /auth/me` - Get current user
+
+### API Keys
+- `POST /api-keys` - Create API key
+- `GET /api-keys` - List all keys
+- `DELETE /api-keys/{id}` - Revoke key
+
+### Subscriptions
+- `POST /subscriptions` - Upgrade tier
+
+### Payments
+- `POST /payments` - Process payment
+
+### Usage
+- `GET /usage` - Get statistics
+
+## Use Cases
+
+### AI Agent Monetization
+
+```python
+# AI agent charges user for service
+transaction = client.create_payment(
+    amount=9.99,
+    metadata={"agent_id": "agent_123", "service": "analysis"}
+)
 ```
 
-Set `CRON_SECRET` env var and use it to authenticate the cron endpoint.
+### SaaS Billing
 
-## Mobile Monitor
-
-Visit `/m` on your phone for a mobile-optimized job monitor with:
-- Real-time status indicators (green = pass, red = fail)
-- One-tap manual runs
-- Auto-refresh every 10 seconds
-
-## Architecture
-
-- **Framework**: Next.js 14 (App Router)
-- **Database**: Prisma + SQLite (dev) / Postgres (prod)
-- **Auth**: NextAuth.js + GitHub OAuth
-- **Payments**: Stripe Checkout + Customer Portal
-- **Background Jobs**: Vercel Cron
-- **Alerts**: Telegram Bot API
-
-## Development
-
-```bash
-# Run dev server
-pnpm dev
-
-# Build for production
-pnpm build
-
-# Run type checks
-pnpm -r type-check
-
-# Lint
-pnpm lint
+```python
+# Track usage and bill monthly
+usage = client.get_usage()
+monthly_bill = usage.calls.month * 0.01  # $0.01 per call
 ```
+
+### Multi-Tenant Platform
+
+```python
+# Each customer gets isolated API key
+customer_key = client.create_api_key(f"Customer_{id}")
+```
+
+## Security
+
+- JWT authentication with HS256
+- API keys with Bearer token format
+- Stripe webhook signature verification
+- Rate limiting by tier
+- PostgreSQL with parameterized queries
+- HTTPS required in production
+
+## Contributing
+
+We welcome contributions! Please:
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Submit a pull request
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
+
+## Support
+
+- **Documentation:** https://docs.getswiftapi.com
+- **GitHub Issues:** https://github.com/theonlypal/swiftapi/issues
+- **Email:** support@getswiftapi.com
+- **Discord:** https://discord.gg/swiftapi
+
+**Response Times:**
+- Free: 48 hours
+- Indie: 24 hours
+- Pro: 4 hours
+- Enterprise: 1 hour + phone
 
 ## License
 
-MIT
+MIT License - see [LICENSE](./LICENSE) for details.
+
+## Built With
+
+SwiftAPI is built on the shoulders of giants:
+
+- [FastAPI](https://fastapi.tiangolo.com/) - Modern Python web framework
+- [Next.js](https://nextjs.org/) - React framework
+- [Stripe](https://stripe.com/) - Payment processing
+- [PostgreSQL](https://www.postgresql.org/) - Database
+- [Redis](https://redis.io/) - Caching and rate limiting
+
+## Roadmap
+
+- [x] Core API infrastructure
+- [x] Payment processing
+- [x] Subscription management
+- [x] Dashboard
+- [x] Python SDK
+- [x] TypeScript SDK
+- [ ] Webhooks system
+- [ ] Usage-based billing
+- [ ] Team management
+- [ ] OAuth 2.0 (KYA - Know Your Agent)
+- [ ] GraphQL API
+- [ ] Mobile SDKs (iOS, Android)
 
 ---
 
-Built with Next.js 14, Prisma ORM, and Stripe
+Built with focus by [Rayan Pal](https://github.com/theonlypal)

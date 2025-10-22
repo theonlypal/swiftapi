@@ -1,0 +1,32 @@
+{
+  "name": "@swiftapi/sdk",
+  "version": "1.0.0",
+  "description": "Official TypeScript/JavaScript SDK for SwiftAPI - Unified infrastructure API for AI agents",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "swiftapi",
+    "ai",
+    "agents",
+    "payments",
+    "billing",
+    "infrastructure"
+  ],
+  "author": "SwiftAPI",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/theonlypal/swiftapi"
+  },
+  "dependencies": {
+    "axios": "^1.6.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.2",
+    "@types/node": "^20.9.4"
+  }
+}
