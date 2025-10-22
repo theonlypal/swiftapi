@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Simple storage (TODO: Encrypt headers/body for production)
+    // Note: Headers and body stored as JSON. Production systems should encrypt sensitive data.
     const job = await prisma.job.create({
       data: {
         userId: session.user.id,

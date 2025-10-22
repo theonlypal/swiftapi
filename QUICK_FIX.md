@@ -1,24 +1,24 @@
-# SWIFTAPI - QUICK FIX FOR 404 ERROR
+# SwiftAPI - 404 Error Resolution
 
-## 🚨 PROBLEM IDENTIFIED
+## Problem Analysis
 
-All deployments are **ERRORING** because Vercel doesn't know to look in `apps/web` for a monorepo.
+All deployments fail because Vercel cannot locate the Next.js app in the monorepo structure.
 
-**Current Status**: `DEPLOYMENT_NOT_FOUND` → 404 on all URLs
+Current Status: `DEPLOYMENT_NOT_FOUND` - 404 on all URLs
 
 ---
 
-## ✅ 2-MINUTE FIX
+## Resolution Steps
 
-### Step 1: Fix Vercel Build Settings
+### Step 1: Configure Vercel Build Settings
 
-1. **Open**: https://vercel.com/rayan-pals-projects/swiftapi/settings
+1. Open: https://vercel.com/rayan-pals-projects/swiftapi/settings
 
-2. **Scroll down** to "Build & Development Settings"
+2. Navigate to "Build & Development Settings"
 
-3. **Click "OVERRIDE"** button
+3. Click "OVERRIDE"
 
-4. **Set EXACTLY**:
+4. Set exact values:
    ```
    Root Directory: apps/web
    Build Command: pnpm build
@@ -26,129 +26,122 @@ All deployments are **ERRORING** because Vercel doesn't know to look in `apps/we
    Install Command: pnpm install
    ```
 
-5. **Click "Save"**
+5. Save changes
 
 ### Step 2: Redeploy
 
-1. **Go to**: https://vercel.com/rayan-pals-projects/swiftapi
+1. Navigate to: https://vercel.com/rayan-pals-projects/swiftapi
 
-2. **Click "Redeploy"** on the latest deployment
+2. Click "Redeploy" on latest deployment
 
-3. **Wait 2 minutes** - it will succeed this time!
+3. Wait approximately 2 minutes for build completion
 
-4. **Test**: Visit `https://swiftapi-rayan-pals-projects.vercel.app`
-   - Should see your landing page ✅
+4. Verify: Visit `https://swiftapi-rayan-pals-projects.vercel.app`
+   - Should display landing page
 
 ---
 
-## 🌐 FIX DNS (Do After Deployment Works)
+## DNS Configuration
 
 ### Problem
-Your domain `getswiftapi.com` is resolving to IPs `64.29.17.1, 216.198.79.65` which are NOT Vercel.
+Domain `getswiftapi.com` resolves to IPs `64.29.17.1, 216.198.79.65` (non-Vercel infrastructure).
 
 ### Solution
 
-1. **Log into your domain registrar** (where you bought getswiftapi.com)
+1. Access domain registrar (where getswiftapi.com was purchased)
 
-2. **Find DNS/Nameserver settings**
+2. Locate DNS/Nameserver settings
 
-3. **Change nameservers to**:
+3. Update nameservers:
    ```
    ns1.vercel-dns.com
    ns2.vercel-dns.com
    ```
 
-4. **Wait 5-10 minutes** for DNS propagation
+4. Wait 5-10 minutes for DNS propagation
 
-5. **Add domain in Vercel**:
-   - Go to: https://vercel.com/rayan-pals-projects/swiftapi/settings/domains
+5. Add domain in Vercel:
+   - Navigate to: https://vercel.com/rayan-pals-projects/swiftapi/settings/domains
    - Click "Add"
-   - Type: `getswiftapi.com`
-   - Click "Add"
+   - Enter: `getswiftapi.com`
+   - Confirm
 
-6. **Repeat for**: `swiftapi.api`
+6. Repeat for: `swiftapi.api`
 
 ---
 
-## 📋 ENVIRONMENT VARIABLES (Add Later - Won't Block Build)
+## Environment Variables
 
-You asked for the list - here it is:
+Configuration (non-blocking for build):
 
 ```bash
-# REQUIRED (but build will work without them for now)
+# Required (build succeeds without these, but features need them)
 NEXTAUTH_URL=https://getswiftapi.com
 NEXTAUTH_SECRET=generate_with_openssl_rand_base64_32
 APP_URL=https://getswiftapi.com
 DATABASE_URL=postgresql://your_postgres_connection
 
-# GITHUB OAUTH (create at github.com/settings/developers)
+# GitHub OAuth (create at github.com/settings/developers)
 GITHUB_ID=your_client_id
 GITHUB_SECRET=your_client_secret
 
-# STRIPE (from dashboard.stripe.com)
+# Stripe (from dashboard.stripe.com)
 STRIPE_SECRET_KEY=sk_test_your_key
 STRIPE_WEBHOOK_SECRET=whsec_your_secret
 STRIPE_PRICE_ID=price_your_id
 
-# OPTIONAL
+# Optional
 TELEGRAM_BOT_TOKEN=
 TELEGRAM_CHAT_ID=
 CRON_SECRET=random_string
 ```
 
-**Add these at**: https://vercel.com/rayan-pals-projects/swiftapi/settings/environment-variables
+Add at: https://vercel.com/rayan-pals-projects/swiftapi/settings/environment-variables
 
-**But NOT required** to fix the 404 - the build will complete without them now!
+Note: Build completes without environment variables. Add them to enable authentication, database, and billing features.
 
 ---
 
-## ✅ VERIFICATION
+## Verification
 
-After Root Directory is set and you redeploy:
+After Root Directory configuration and redeployment:
 
 ```bash
-# Test default Vercel URL
+# Test Vercel URL
 curl -I https://swiftapi-rayan-pals-projects.vercel.app
 ```
 
-**Should return**: `HTTP/1.1 200 OK` ✅
-**NOT**: `404 Not Found` ❌
+Expected: `HTTP/1.1 200 OK`
 
-After DNS is fixed and domain added:
+After DNS configuration and domain addition:
 
 ```bash
 # Test custom domain
 curl -I https://getswiftapi.com
 ```
 
-**Should return**: `HTTP/1.1 200 OK` ✅
+Expected: `HTTP/1.1 200 OK`
 
 ---
 
-## 🎯 SUMMARY
+## Summary
 
-**Issue**: Vercel can't find your Next.js app (404)
-**Cause**: Root Directory not set for monorepo
-**Fix**: Set `Root Directory: apps/web` → Redeploy
-**Time**: 2 minutes
+Issue: Vercel cannot locate Next.js app (404)
+Cause: Root Directory not configured for monorepo
+Fix: Set `Root Directory: apps/web` and redeploy
+Duration: ~2 minutes
 
-**Secondary Issue**: DNS not pointing to Vercel
-**Cause**: Nameservers wrong
-**Fix**: Point to `ns1.vercel-dns.com` + `ns2.vercel-dns.com`
-**Time**: 5-10 minutes (propagation)
-
----
-
-## 🚀 DO THIS NOW
-
-1. ✅ Set Root Directory to `apps/web`
-2. ✅ Click Redeploy
-3. ⏰ Wait 2 minutes
-4. ✅ Test the .vercel.app URL
-5. 🌐 Fix DNS (after step 4 works)
-
-**Then you're LIVE! 🔥**
+Secondary Issue: DNS not pointing to Vercel
+Cause: Incorrect nameservers
+Fix: Update to `ns1.vercel-dns.com` + `ns2.vercel-dns.com`
+Duration: 5-10 minutes (propagation)
 
 ---
 
-Generated with Claude Code via Happy
+## Action Items
+
+1. Set Root Directory to `apps/web`
+2. Initiate redeployment
+3. Wait ~2 minutes
+4. Verify .vercel.app URL
+5. Configure DNS (after step 4 succeeds)

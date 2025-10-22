@@ -1,15 +1,15 @@
 # SwiftAPI Jobs
 
-**API Monitoring on Autopilot** - Schedule API calls, validate responses, get instant alerts.
+Production-grade API monitoring service with scheduled execution and automated alerting.
 
 ## Features
 
-- 🔄 **Scheduled Monitoring** - Run API checks every 1m, 5m, 15m, or hourly
-- ✅ **Smart Validation** - Check HTTP status + JSONPath assertions
-- 📱 **Mobile-First UI** - Monitor from anywhere at `/m`
-- 🚨 **Instant Alerts** - Telegram notifications on failures
-- 💳 **Stripe Billing** - Free tier + Pro subscription
-- 🔐 **GitHub Auth** - Secure authentication via NextAuth.js
+- Scheduled monitoring at 1m, 5m, 15m, or hourly intervals
+- HTTP status validation with JSONPath assertion support
+- Mobile-optimized UI at `/m`
+- Telegram notification integration for failure alerts
+- Stripe-based subscription billing
+- GitHub OAuth authentication via NextAuth.js
 
 ## Quick Start
 
@@ -146,7 +146,7 @@ curl -X POST http://localhost:3000/api/exec \
 | Jobs | 1 | 20 |
 | Min Interval | 15m | 1m |
 | Logs Retention | 7 days | 90 days |
-| Telegram Alerts | ❌ | ✅ |
+| Telegram Alerts | No | Yes |
 
 ## Deployment
 
@@ -227,4 +227,4 @@ MIT
 
 ---
 
-Built with ❤️ using Next.js, Prisma, and Stripe
+Built with Next.js 14, Prisma ORM, and Stripe

@@ -68,7 +68,9 @@ export default async function DashboardPage() {
                   <p className="text-sm text-gray-600">{job.url}</p>
                   <p className="text-xs text-gray-500 mt-2">
                     Schedule: {job.schedule} | Status:{' '}
-                    {job.runs[0]?.ok ? '✅ Pass' : '❌ Fail'}
+                    <span className={job.runs[0]?.ok ? 'text-green-600' : 'text-red-600'}>
+                      {job.runs[0]?.ok ? 'Pass' : 'Fail'}
+                    </span>
                   </p>
                 </div>
               ))}

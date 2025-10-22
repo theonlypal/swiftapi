@@ -76,7 +76,7 @@ export async function POST(
 
     if (!ok) {
       await sendAlert(
-        `🚨 Job *${job.name}* failed!\nStatus: ${statusCode}\nError: ${errorMsg || 'Check expected vs actual'}`
+        `[ALERT] Job *${job.name}* failed!\nStatus: ${statusCode}\nError: ${errorMsg || 'Check expected vs actual'}`
       );
     }
 

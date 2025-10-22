@@ -112,7 +112,7 @@ async function runJob(job: any) {
 
   if (!ok) {
     await sendAlert(
-      `🚨 Job *${job.name}* failed!\nStatus: ${statusCode}\nError: ${errorMsg || 'Check conditions'}`
+      `[ALERT] Job *${job.name}* failed!\nStatus: ${statusCode}\nError: ${errorMsg || 'Check conditions'}`
     );
   }
 

@@ -1,36 +1,128 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SwiftAPI Web Application
 
-## Getting Started
+Next.js 14 application for API monitoring and job scheduling.
 
-First, run the development server:
+## Architecture
+
+- Framework: Next.js 14 (App Router)
+- Database: Prisma ORM with PostgreSQL/SQLite
+- Authentication: NextAuth.js with GitHub OAuth
+- Payments: Stripe Checkout and Customer Portal
+- Styling: Tailwind CSS
+
+## Development
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+# Install dependencies
+pnpm install
+
+# Setup environment
+cp .env.example .env.local
+
+# Run database migrations
+pnpm prisma generate
+pnpm prisma migrate dev
+
+# Start development server
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Visit http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment Configuration
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Required variables:
 
-## Learn More
+```bash
+# Authentication
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=<generate-with-openssl-rand-base64-32>
+APP_URL=http://localhost:3000
 
-To learn more about Next.js, take a look at the following resources:
+# Database
+DATABASE_URL=file:./dev.db
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# GitHub OAuth
+GITHUB_ID=<github-oauth-client-id>
+GITHUB_SECRET=<github-oauth-client-secret>
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Stripe
+STRIPE_SECRET_KEY=sk_test_xxx
+STRIPE_WEBHOOK_SECRET=whsec_xxx
+STRIPE_PRICE_ID=price_xxx
 
-## Deploy on Vercel
+# Optional: Telegram Alerts
+TELEGRAM_BOT_TOKEN=<bot-token>
+TELEGRAM_CHAT_ID=<chat-id>
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# Cron Authentication
+CRON_SECRET=<random-secret>
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Project Structure
+
+```
+app/
+├── (app)/              # Authenticated routes
+│   └── dashboard/      # User dashboard
+├── (marketing)/        # Public marketing pages
+├── api/                # API routes
+│   ├── auth/           # NextAuth endpoints
+│   ├── jobs/           # Job management
+│   ├── exec/           # Execution proxy
+│   ├── stripe/         # Payment webhooks
+│   └── _cron/          # Scheduled job execution
+├── m/                  # Mobile-optimized monitor
+└── layout.tsx          # Root layout
+
+lib/
+├── prisma.ts           # Database client
+├── auth.ts             # NextAuth configuration
+├── stripe.ts           # Stripe client
+├── alerts.ts           # Telegram notifications
+├── rate.ts             # Rate limiting
+└── jsonpath.ts         # JSONPath evaluation
+
+components/
+├── HeroDemo.tsx        # Landing page demo
+├── JobCardMobile.tsx   # Mobile job card
+└── JobsListMobile.tsx  # Mobile job list
+```
+
+## API Routes
+
+- `POST /api/jobs` - Create job
+- `GET /api/jobs` - List jobs
+- `POST /api/jobs/[id]/run` - Execute job manually
+- `POST /api/exec` - Proxy API requests (requires API key)
+- `POST /api/_cron/jobs` - Scheduled job execution (requires CRON_SECRET)
+- `POST /api/stripe/checkout` - Create checkout session
+- `POST /api/stripe/webhook` - Handle Stripe events
+
+## Database Schema
+
+13 models including:
+- User (authentication)
+- Account (OAuth accounts)
+- Session (user sessions)
+- Job (API monitoring jobs)
+- JobRun (execution history)
+- Subscription (Stripe subscriptions)
+- ApiKey (API authentication)
+
+## Build
+
+```bash
+# Type checking
+pnpm type-check
+
+# Build for production
+pnpm build
+
+# Start production server
+pnpm start
+```
+
+## Deployment
+
+See root `DEPLOYMENT_GUIDE.md` for Vercel deployment instructions.

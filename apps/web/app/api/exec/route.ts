@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
       userId = session.user.id;
     } else if (authHeader?.startsWith('Bearer ')) {
       const token = authHeader.substring(7);
-      // Simple API key lookup (production should use proper hashing)
+      // API key validation. Production systems should use bcrypt or similar hashing.
       const apiKey = await prisma.apiKey.findFirst({
         where: { keyHash: token },
       });

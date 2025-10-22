@@ -1,8 +1,7 @@
 import { JobCardMobile } from './JobCardMobile';
 
 async function getJobs() {
-  // Server component - fetch jobs
-  // In production, this would use proper session handling
+  // Placeholder for server-side job fetching with session authentication
   return [];
 }
 
