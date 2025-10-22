@@ -1,248 +1,218 @@
-# SwiftAPI Jobs - Deployment Guide
+# SwiftAPI Deployment Guide
 
-## Implementation Status
+Complete guide to deploy SwiftAPI backend and connect it to your frontend.
 
-Production-ready application with complete feature set:
-- 7 API routes (auth, jobs, cron, stripe, exec)
-- 3 pages (marketing, dashboard, mobile /m)
-- Prisma schema with 13 models
-- Authentication (NextAuth + GitHub OAuth)
-- Stripe billing integration
-- Rate limiting and validation
-- TypeScript strict mode compliance
-- Local build verification complete
-- Git repository initialized
+## What's Already Done ✅
 
-Project Location: `C:\Users\Rayan Pal\Desktop\swiftapi`
+- ✅ Frontend deployed to Vercel at https://swiftapi.ai
+- ✅ GitHub repository at https://github.com/theonlypal/swiftapi
+- ✅ Railway project created: https://railway.com/project/91da69ab-f43e-4dd3-80ad-62ae9d04c7ae
+- ✅ PostgreSQL and Redis services added to Railway
 
----
+## What You Need to Setup 🔧
 
-## Vercel Configuration
+### 1. Railway Backend Deployment (5 minutes)
 
-Deployments require manual configuration for monorepo structure:
+**Go to:** https://railway.com/project/91da69ab-f43e-4dd3-80ad-62ae9d04c7ae
 
-### Step 1: Configure Project Settings
+**Step 1: Create New Service**
+1. Click "+ New Service"
+2. Select "GitHub Repo"
+3. Choose `theonlypal/swiftapi`
+4. Set Root Directory: `backend`
+5. Click "Deploy"
 
-1. Navigate to: https://vercel.com/rayan-pals-projects/swiftapi/settings
+**Step 2: Add Environment Variables**
 
-2. Access "Build & Development Settings"
+Click on the new service → Variables tab → Add these:
 
-3. Configure exact values:
-
-   ```
-   Root Directory: apps/web
-   Build Command: pnpm build
-   Output Directory: .next
-   Install Command: pnpm install
-   Framework Preset: Next.js
-   Node.js Version: 22.x (default)
-   ```
-
-4. Save changes
-
----
-
-### Step 2: Configure Environment Variables
-
-1. Navigate to: https://vercel.com/rayan-pals-projects/swiftapi/settings/environment-variables
-
-2. Add variables (apply to Production, Preview, and Development):
-
-   ```bash
-   # Required for build
-   NEXTAUTH_URL=https://getswiftapi.com
-   NEXTAUTH_SECRET=GENERATE_WITH_openssl_rand_base64_32
-   APP_URL=https://getswiftapi.com
-   DATABASE_URL=YOUR_POSTGRES_CONNECTION_STRING
-
-   # GitHub OAuth (create at: https://github.com/settings/developers)
-   GITHUB_ID=YOUR_GITHUB_OAUTH_CLIENT_ID
-   GITHUB_SECRET=YOUR_GITHUB_OAUTH_CLIENT_SECRET
-
-   # Stripe (from: https://dashboard.stripe.com)
-   STRIPE_SECRET_KEY=sk_test_YOUR_REAL_KEY
-   STRIPE_WEBHOOK_SECRET=whsec_YOUR_WEBHOOK_SECRET
-   STRIPE_PRICE_ID=price_YOUR_PRICE_ID
-
-   # Optional
-   TELEGRAM_BOT_TOKEN=(optional)
-   TELEGRAM_CHAT_ID=(optional)
-   CRON_SECRET=RANDOM_SECRET_FOR_CRON_AUTH
-   ```
-
-3. Save each variable
-
----
-
-### Step 3: Configure GitHub OAuth App
-
-1. Navigate to: https://github.com/settings/developers
-2. Create new OAuth App
-3. Configure:
-   ```
-   Application name: SwiftAPI Jobs
-   Homepage URL: https://getswiftapi.com
-   Authorization callback URL: https://getswiftapi.com/api/auth/callback/github
-   ```
-4. Copy **Client ID** → `GITHUB_ID` env var
-5. Generate **Client Secret** → `GITHUB_SECRET` env var
-
----
-
-### Step 4: Configure Stripe
-
-1. Navigate to: https://dashboard.stripe.com/test/products
-2. Create Product: "SwiftAPI Pro"
-3. Add Price: $19/month (recurring)
-4. Copy `price_xxx` ID to `STRIPE_PRICE_ID` env var
-5. Retrieve API key from: https://dashboard.stripe.com/test/apikeys
-   - Copy Secret key to `STRIPE_SECRET_KEY` env var
-6. Configure webhook:
-   - URL: `https://getswiftapi.com/api/stripe/webhook`
-   - Events: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`
-   - Copy Signing secret to `STRIPE_WEBHOOK_SECRET` env var
-
----
-
-### Step 5: Configure Database
-
-Option A: Vercel Postgres (Recommended)
-1. Navigate to: https://vercel.com/rayan-pals-projects/swiftapi/stores
-2. Create Postgres database
-3. Copy connection string to `DATABASE_URL` env var
-
-Option B: External Postgres
-1. Use Railway, Supabase, or alternative Postgres provider
-2. Obtain connection string
-3. Set as `DATABASE_URL` env var
-
-After database connection:
 ```bash
-cd "C:\Users\Rayan Pal\Desktop\swiftapi\apps\web"
-npx prisma migrate deploy
+# Database (Railway provides this automatically - click "Add Reference" and select DATABASE_URL from Postgres service)
+DATABASE_URL=${{Postgres.DATABASE_URL}}
+
+# Redis (click "Add Reference" and select REDIS_URL from Redis service)
+REDIS_URL=${{Redis.REDIS_URL}}
+
+# Secret Key (generate with: openssl rand -hex 32)
+SECRET_KEY=<paste-your-generated-secret-key>
+
+# Stripe (get from https://dashboard.stripe.com/test/apikeys)
+STRIPE_SECRET_KEY=sk_test_<your_stripe_key>
+STRIPE_WEBHOOK_SECRET=whsec_<your_webhook_secret>
 ```
 
+**Step 3: Generate Domain**
+1. Go to Settings tab
+2. Click "Generate Domain"
+3. Copy the URL (looks like: `swiftapi-backend-production.up.railway.app`)
+
+### 2. Stripe Setup (10 minutes)
+
+**Create Stripe Account:**
+1. Go to https://stripe.com
+2. Sign up for free account
+3. Stay in Test Mode (for now)
+
+**Get API Keys:**
+1. Dashboard → Developers → API keys
+2. Copy "Secret key" (starts with `sk_test_`)
+3. Paste into Railway environment variable: `STRIPE_SECRET_KEY`
+
+**Create Subscription Products:**
+1. Dashboard → Products → Add product
+2. Create 4 products:
+   - **Indie**: $49/month recurring
+   - **Pro**: $199/month recurring
+   - **Enterprise**: $999/month recurring
+3. Copy price IDs (start with `price_`)
+
+**Setup Webhook:**
+1. Dashboard → Developers → Webhooks → Add endpoint
+2. URL: `https://your-backend.railway.app/webhooks/stripe`
+3. Events to send:
+   - `checkout.session.completed`
+   - `customer.subscription.updated`
+   - `customer.subscription.deleted`
+   - `payment_intent.succeeded`
+   - `payment_intent.payment_failed`
+4. Copy "Signing secret" (starts with `whsec_`)
+5. Paste into Railway: `STRIPE_WEBHOOK_SECRET`
+
+### 3. Connect Frontend to Backend (2 minutes)
+
+**Go to Vercel:** https://vercel.com/rayan-pals-projects/swiftapi/settings/environment-variables
+
+**Add Environment Variable:**
+```
+Name: NEXT_PUBLIC_API_URL
+Value: https://your-backend.railway.app
+Environment: Production, Preview, Development
+```
+
+Click "Save" → Trigger redeploy
+
+### 4. Initialize Database (1 minute)
+
+**One-time setup to create tables:**
+
+**Option A - Railway CLI:**
+```bash
+cd C:\Users\Rayan Pal\Desktop\SWIFTAPI\backend
+railway run python -c "from database import Base, engine; Base.metadata.create_all(bind=engine)"
+```
+
+**Option B - Railway Dashboard:**
+1. Go to your backend service
+2. Click "Deployments" tab
+3. Click on latest deployment
+4. Click "View Logs"
+5. The app will auto-create tables on first request to `/health`
+
+### 5. Test the System (2 minutes)
+
+**Visit:** https://swiftapi.ai
+
+1. Click "Sign up"
+2. Enter email and password
+3. Should create account and redirect to dashboard
+4. Try creating an API key
+5. View usage statistics
+
+## Environment Variables Checklist
+
+**Backend (Railway):**
+- [ ] `DATABASE_URL` - Auto-generated by Railway Postgres
+- [ ] `REDIS_URL` - Auto-generated by Railway Redis
+- [ ] `SECRET_KEY` - Generate with: `openssl rand -hex 32`
+- [ ] `STRIPE_SECRET_KEY` - From Stripe Dashboard
+- [ ] `STRIPE_WEBHOOK_SECRET` - From Stripe Webhooks
+
+**Frontend (Vercel):**
+- [ ] `NEXT_PUBLIC_API_URL` - Your Railway backend URL
+
+## Quick Commands
+
+**Generate SECRET_KEY:**
+```bash
+openssl rand -hex 32
+```
+
+**Test Backend Health:**
+```bash
+curl https://your-backend.railway.app/health
+```
+
+**Test Frontend API Connection:**
+```bash
+curl https://swiftapi.ai/api/health
+```
+
+**View Railway Logs:**
+```bash
+cd backend
+railway logs
+```
+
+## Troubleshooting
+
+**Frontend shows API errors:**
+- Check `NEXT_PUBLIC_API_URL` is set in Vercel
+- Verify backend is deployed and running on Railway
+- Check Railway logs for errors
+
+**Backend won't start:**
+- Verify all environment variables are set
+- Check Railway build logs for Python errors
+- Ensure `DATABASE_URL` and `REDIS_URL` are connected
+
+**Stripe webhooks failing:**
+- Verify webhook URL is: `https://your-backend.railway.app/webhooks/stripe`
+- Check `STRIPE_WEBHOOK_SECRET` matches Stripe dashboard
+- View Stripe webhook logs in dashboard
+
+**Database connection errors:**
+- Railway Postgres must be in same project
+- Use `${{Postgres.DATABASE_URL}}` reference syntax
+- Check database service is running
+
+## What Happens Next
+
+Once deployed:
+
+1. Users can sign up at swiftapi.ai
+2. They get Free tier (1,000 API calls/month)
+3. They can create API keys
+4. They can upgrade to paid tiers via Stripe
+5. You capture 2% of all transactions OR $0.05 per API call
+
+## Cost Breakdown
+
+**Railway (Backend hosting):**
+- Hobby Plan: $5/month (500 hours)
+- Includes: 8GB RAM, 8GB disk, 100GB transfer
+- PostgreSQL + Redis included
+
+**Stripe (Payment processing):**
+- 2.9% + 30¢ per transaction
+- You charge 2% platform fee on top
+
+**Vercel (Frontend hosting):**
+- Free tier: Unlimited bandwidth
+- Hobby: $20/month if needed
+
+**Total:** ~$5-25/month to run infrastructure that can generate $1M+/year
+
+## Revenue Example
+
+With 100 developers each processing $10,000/month:
+- Monthly volume: $1,000,000
+- Your 2% fee: $20,000/month
+- Minus Stripe fees (2.9%): $14,200/month
+- Minus infrastructure ($25): $14,175/month
+- **Annual revenue: ~$170,000**
+
 ---
 
-### Step 6: Initiate Redeployment
+**Railway Project:** https://railway.com/project/91da69ab-f43e-4dd3-80ad-62ae9d04c7ae
 
-1. Navigate to: https://vercel.com/rayan-pals-projects/swiftapi
-2. Click "Redeploy" on latest deployment
-3. Wait for build completion
-
----
-
-### Step 7: Configure Custom Domains
-
-1. Navigate to: https://vercel.com/rayan-pals-projects/swiftapi/settings/domains
-
-2. Add getswiftapi.com:
-   - Click "Add"
-   - Follow DNS instructions if nameservers not configured
-
-3. Add swiftapi.api:
-   - Click "Add"
-   - Follow DNS instructions
-
-4. Wait for DNS propagation (typically minutes, up to 24 hours)
-
----
-
-## Verification Checklist
-
-After deployment succeeds:
-
-- [ ] Visit https://getswiftapi.com → See landing page
-- [ ] Visit https://swiftapi.api → See landing page
-- [ ] Click "Start Free" → GitHub OAuth works
-- [ ] After login → Dashboard loads
-- [ ] Visit https://getswiftapi.com/m → Mobile monitor loads
-- [ ] Test creating a job
-- [ ] Test Stripe checkout (test mode)
-- [ ] Verify cron runs (check Vercel Functions tab)
-
----
-
-## Technical Stack
-
-Production SaaS Implementation:
-- Monorepo architecture (pnpm + Turbo)
-- Next.js 14 App Router
-- Authentication system
-- Stripe subscription billing
-- API monitoring with cron jobs
-- Mobile-responsive UI
-- Rate limiting and security
-
-Implementation Metrics:
-- 50+ files
-- 5,400+ lines of code
-- 7 API routes
-- 13 database models
-- 6 library modules
-- 3 UI pages
-- Production-ready
-
----
-
-## Reference Links
-
-Vercel:
-- Project: https://vercel.com/rayan-pals-projects/swiftapi
-- Settings: https://vercel.com/rayan-pals-projects/swiftapi/settings
-- Environment Variables: https://vercel.com/rayan-pals-projects/swiftapi/settings/environment-variables
-- Domains: https://vercel.com/rayan-pals-projects/swiftapi/settings/domains
-
-External Services:
-- GitHub OAuth Apps: https://github.com/settings/developers
-- Stripe Dashboard: https://dashboard.stripe.com
-
-Local:
-- Project Directory: `C:\Users\Rayan Pal\Desktop\swiftapi`
-- README: `C:\Users\Rayan Pal\Desktop\swiftapi\README.md`
-- Env Template: `C:\Users\Rayan Pal\Desktop\swiftapi\vercel-env-setup.txt`
-
----
-
-## Operational Notes
-
-1. Local Testing:
-   ```bash
-   cd "C:\Users\Rayan Pal\Desktop\swiftapi"
-   pnpm dev
-   # Visit: http://localhost:3000
-   ```
-
-2. Database Migrations:
-   ```bash
-   cd apps/web
-   npx prisma migrate dev --name description_of_change
-   npx prisma generate
-   ```
-
-3. Stripe Testing:
-   - Test card: `4242 4242 4242 4242`
-   - Any future expiry, any CVC
-
-4. Cron Jobs:
-   - Hobby plan: daily execution only
-   - Pro plan: minute-level execution
-   - Manual testing: `POST /api/_cron/jobs` with `Bearer CRON_SECRET`
-
-5. Monitoring:
-   - Vercel Functions tab: cron logs
-   - Vercel Logs: API errors
-   - Mobile UI at `/m`: job status
-
----
-
-## Post-Deployment Actions
-
-1. Create first API key for CLI usage
-2. Test complete flow: Sign up → Create job → Wait for cron → Check logs
-3. Configure production Stripe (switch from test mode)
-4. Configure Telegram alerts (optional)
-5. Create public GitHub repository:
-   - URL: https://github.com/new
-   - Push code: `git remote add origin https://github.com/theonlypal/swiftapi.git`
-   - Execute: `git push -u origin main`
+**Next Step:** Go to Railway dashboard and complete Step 1 above to deploy the backend service.
