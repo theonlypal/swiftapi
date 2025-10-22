@@ -140,20 +140,20 @@ export default function GettingStarted() {
             <div className="mb-6">
               <h3 className="font-semibold text-gray-900 mb-2">Python Example</h3>
               <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm">
-                <code>{`from swiftapi import SwiftAPI
-
-# Initialize with your API key
-client = SwiftAPI(api_key="sk_your_api_key_here")
-
-# Test the connection
-user = client.get_current_user()
-print(f"Connected as: ${'{'} user.email ${'}'}")
-print(f"Current tier: ${'{'} user.tier ${'}'}")
-
-# Check your usage
-usage = client.get_usage()
-print(f"API calls this month: ${'{'} usage.calls.month ${'}'}")
-print(f"Rate limit: ${'{'} usage.rate_limits.minute_remaining ${'}'} calls/min remaining")`}</code>
+                <code>{'from swiftapi import SwiftAPI\n' +
+'\n' +
+'# Initialize with your API key\n' +
+'client = SwiftAPI(api_key="sk_your_api_key_here")\n' +
+'\n' +
+'# Test the connection\n' +
+'user = client.get_current_user()\n' +
+'print(f"Connected as: {user.email}")\n' +
+'print(f"Current tier: {user.tier}")\n' +
+'\n' +
+'# Check your usage\n' +
+'usage = client.get_usage()\n' +
+'print(f"API calls this month: {usage.calls.month}")\n' +
+'print(f"Rate limit: {usage.rate_limits.minute_remaining} calls/min remaining")'}</code>
               </pre>
             </div>
 
@@ -193,18 +193,18 @@ console.log(\`Rate limit: \$\{usage.rate_limits.minute_remaining\} calls/min\`);
             </p>
 
             <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm mb-4">
-              <code>{`# Process a $9.99 payment
-transaction = client.create_payment(
-    amount=9.99,
-    currency="usd",
-    metadata=${'{'}"user_id": "user_123", "service": "ai_analysis", "prompt_tokens": 1500${'}'}
-)
-
-print(f"Transaction ID: ${'{'} transaction.id ${'}'}")
-print(f"Amount charged: $${'{'} transaction.amount ${'}'}")
-print(f"SwiftAPI fee: $${'{'} transaction.fee_amount ${'}'}")
-print(f"You receive: $${'{'} transaction.amount - transaction.fee_amount ${'}'}")
-print(f"Status: ${'{'} transaction.status ${'}'}")`}</code>
+              <code>{'# Process a $9.99 payment\n' +
+'transaction = client.create_payment(\n' +
+'    amount=9.99,\n' +
+'    currency="usd",\n' +
+'    metadata={"user_id": "user_123", "service": "ai_analysis", "prompt_tokens": 1500}\n' +
+')\n' +
+'\n' +
+'print(f"Transaction ID: {transaction.id}")\n' +
+'print(f"Amount charged: ${transaction.amount}")\n' +
+'print(f"SwiftAPI fee: ${transaction.fee_amount}")\n' +
+'print(f"You receive: ${transaction.amount - transaction.fee_amount}")\n' +
+'print(f"Status: {transaction.status}")'}</code>
             </pre>
 
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
