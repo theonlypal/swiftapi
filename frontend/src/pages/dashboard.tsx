@@ -103,7 +103,7 @@ export default function Dashboard() {
             <h3 className="text-lg font-medium text-gray-900 mb-4">Usage This Month</h3>
             <div className="mb-2 flex justify-between text-sm">
               <span className="text-gray-500">
-                {usage?.calls.month.toLocaleString()} / {user && tierLimits[user.tier] === Infinity ? '∞' : tierLimits[user.tier].toLocaleString()} calls
+                {usage?.calls.month.toLocaleString()} / {user && tierLimits[user.tier] === Infinity ? '∞' : user ? tierLimits[user.tier].toLocaleString() : 0} calls
               </span>
               <span className="font-medium text-gray-900">
                 {usagePercentage.toFixed(1)}%
