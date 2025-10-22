@@ -80,8 +80,7 @@ export default function Landing() {
             <div className="absolute inset-0 bg-gradient-to-r from-primary-100 via-purple-100 to-pink-100 rounded-3xl transform rotate-1"></div>
             <div className="relative bg-white rounded-2xl shadow-2xl p-8 border border-gray-200">
               <pre className="text-sm overflow-x-auto">
-                <code className="language-python">
-{`from swiftapi import SwiftAPI
+                <code className="language-python">{`from swiftapi import SwiftAPI
 
 # Initialize with your API key
 client = SwiftAPI(api_key="sk_your_key")
@@ -95,9 +94,8 @@ transaction = client.create_payment(
 # ✓ 2% platform fee captured
 # ✓ Usage tracked automatically
 
-print(f"Transaction: {transaction.id}")
-print(f"Your fee: ${transaction.fee_amount}")`}
-                </code>
+print(f"Transaction: ${'${transaction.id}'}")
+print(f"Your fee: ${'${transaction.fee_amount}'}")`}</code>
               </pre>
             </div>
           </div>
