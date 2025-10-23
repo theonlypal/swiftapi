@@ -1,371 +1,212 @@
+import React from 'react';
 import Link from 'next/link';
-import { Inter } from '@next/font/google';
+import { Inter } from 'next/font/google';
 
 const inter = Inter({ subsets: ['latin'] });
 
+// Navigation Card Type
+interface NavCardProps {
+  title: string;
+  description: string;
+  href: string;
+  icon: React.ReactNode;
+}
+
+// Navigation Card Component
+const NavCard: React.FC<NavCardProps> = ({ title, description, href, icon }) => (
+  <Link
+    href={href}
+    className="group block p-6 bg-white rounded-xl shadow-sm border border-gray-200 hover:border-primary-500 hover:shadow-md transition-all"
+  >
+    <div className="flex items-center mb-3">
+      <div className="mr-4">{icon}</div>
+      <h3 className="text-xl font-semibold text-gray-900 group-hover:text-primary-600 transition">
+        {title} →
+      </h3>
+    </div>
+    <p className="text-gray-600">{description}</p>
+  </Link>
+);
+
 export default function DocsHome() {
+  const navCards: NavCardProps[] = [
+    {
+      title: 'Introduction',
+      description: 'Learn what SwiftAPI is and how it simplifies AI agent infrastructure.',
+      href: '/docs/introduction',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+        </svg>
+      )
+    },
+    {
+      title: 'Quickstart',
+      description: 'Get up and running with SwiftAPI in 5 minutes.',
+      href: '/docs/quickstart',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+      )
+    },
+    {
+      title: 'API Reference',
+      description: 'Comprehensive documentation for all SwiftAPI endpoints.',
+      href: '/docs/api-reference/payments/process',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
+        </svg>
+      )
+    },
+    {
+      title: 'Python SDK',
+      description: 'Complete SDK reference for Python developers.',
+      href: '/docs/sdks/python',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 11c0 3.517-1.979 6.476-5 7.775C6.817 19.567 9.713 21 13 21c3.193 0 6-1.397 6-3.636V8.91c0-2.474-1.845-4.423-4.265-4.423H8.48c-1.435 0-2.614-.986-2.614-2.247v-.383c0-.962.774-1.75 1.734-1.75H16" />
+        </svg>
+      )
+    },
+    {
+      title: 'TypeScript SDK',
+      description: 'Full SDK documentation with type definitions.',
+      href: '/docs/sdks/typescript',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+        </svg>
+      )
+    }
+  ];
+
   return (
     <div className={`min-h-screen bg-gray-50 ${inter.className}`}>
-      {/* Header */}
-      <nav className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16 items-center">
-            <Link href="/" className="flex items-center">
-              <span className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 bg-clip-text text-transparent">
-                SwiftAPI
-              </span>
-              <span className="ml-3 text-sm text-gray-500">Documentation</span>
-            </Link>
-            <div className="flex items-center space-x-4">
-              <Link href="/" className="text-gray-600 hover:text-gray-900 transition">
-                Home
-              </Link>
-              <Link href="/login" className="btn-primary text-sm">
-                Dashboard
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      {/* Hero */}
-      <div className="bg-gradient-to-b from-primary-50 to-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <h1 className="text-5xl font-bold text-gray-900 mb-4">
+      {/* Hero Section */}
+      <div className="bg-gradient-to-b from-primary-50 to-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+          <h1 className="text-5xl font-bold text-gray-900 mb-6">
             SwiftAPI Documentation
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl">
-            Complete guide to building and monetizing AI agents with SwiftAPI.
-            Accept payments, manage subscriptions, and track usage with a single API.
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+            Streamline payments, subscriptions, and infrastructure for AI agents.
+            One API to handle billing, authentication, and usage tracking.
           </p>
+
+          {/* Search Bar Placeholder */}
+          <div className="max-w-xl mx-auto mb-12">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search documentation..."
+                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900"
+              />
+              <kbd className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-gray-100 border border-gray-300 px-2 py-1 rounded text-xs text-gray-600">
+                ⌘K
+              </kbd>
+            </div>
+          </div>
+
+          {/* Navigation Cards Grid */}
+          <div className="grid md:grid-cols-3 gap-6">
+            {navCards.map((card, index) => (
+              <NavCard key={index} {...card} />
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* What is SwiftAPI */}
-        <section className="mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">What is SwiftAPI?</h2>
-          <div className="prose prose-lg max-w-none">
-            <p className="text-gray-700 mb-4">
-              SwiftAPI is a unified infrastructure platform for AI agent developers. Instead of
-              building payment processing, subscription management, API key authentication, and
-              usage tracking from scratch, you integrate SwiftAPI and get everything in one API.
-            </p>
-            <p className="text-gray-700 mb-4">
-              We handle the complex infrastructure so you can focus on building amazing AI agents.
-            </p>
-          </div>
-        </section>
+      {/* Popular Topics & Recent Updates */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="grid md:grid-cols-2 gap-12">
+          {/* Popular Topics */}
+          <section>
+            <h2 className="text-3xl font-bold text-gray-900 mb-6">Popular Topics</h2>
+            <div className="space-y-4">
+              {[
+                { title: 'Authentication Best Practices', href: '/docs/security/auth' },
+                { title: 'Handling Payments in AI Agents', href: '/docs/payments/guide' },
+                { title: 'Rate Limiting & Performance', href: '/docs/performance/rate-limits' },
+                { title: 'Subscription Management', href: '/docs/billing/subscriptions' }
+              ].map((topic, index) => (
+                <Link
+                  key={index}
+                  href={topic.href}
+                  className="block px-4 py-3 bg-white rounded-lg border border-gray-200 hover:border-primary-500 hover:bg-primary-50 transition"
+                >
+                  <span className="text-gray-900 font-medium">{topic.title} →</span>
+                </Link>
+              ))}
+            </div>
+          </section>
 
-        {/* How It Works */}
-        <section className="mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">How It Works</h2>
+          {/* Recent Updates */}
+          <section>
+            <h2 className="text-3xl font-bold text-gray-900 mb-6">Recent Updates</h2>
+            <div className="space-y-4">
+              {[
+                { version: 'v1.2.0', description: 'Added TypeScript SDK support', date: '2025-09-15' },
+                { version: 'v1.1.5', description: 'Improved payment processing', date: '2025-08-22' },
+                { version: 'v1.1.0', description: 'New API endpoint for subscriptions', date: '2025-07-10' }
+              ].map((update, index) => (
+                <div
+                  key={index}
+                  className="bg-white px-4 py-3 rounded-lg border border-gray-200"
+                >
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <span className="font-semibold text-gray-900 mr-2">{update.version}</span>
+                      <span className="text-gray-600 text-sm">{update.description}</span>
+                    </div>
+                    <span className="text-xs text-gray-500">{update.date}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
+      </div>
+
+      {/* Support Section */}
+      <div className="bg-gray-100 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">Need Help?</h2>
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-              <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-4">
-                <span className="text-2xl font-bold text-primary-600">1</span>
+            {[
+              {
+                title: 'Community Support',
+                description: 'Free tier users can ask questions on GitHub Discussions.',
+                linkText: 'Visit GitHub →',
+                linkHref: 'https://github.com/theonlypal/swiftapi/discussions'
+              },
+              {
+                title: 'Email Support',
+                description: 'Indie and Pro users get 24-48 hour email support.',
+                linkText: 'support@getswiftapi.com →',
+                linkHref: 'mailto:support@getswiftapi.com'
+              },
+              {
+                title: 'Priority Support',
+                description: 'Enterprise users get dedicated support and phone access.',
+                linkText: 'Upgrade to Enterprise →',
+                linkHref: '/signup'
+              }
+            ].map((support, index) => (
+              <div key={index} className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 text-center">
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">{support.title}</h3>
+                <p className="text-gray-600 mb-4">{support.description}</p>
+                <Link
+                  href={support.linkHref}
+                  className="text-primary-600 hover:text-primary-700 font-medium"
+                >
+                  {support.linkText}
+                </Link>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Sign Up & Choose Plan</h3>
-              <p className="text-gray-600">
-                Create your account and select a subscription tier based on your usage needs:
-                Free (1K calls), Indie ($49/mo), Pro ($199/mo), or Enterprise ($999/mo).
-              </p>
-            </div>
-
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-                <span className="text-2xl font-bold text-purple-600">2</span>
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Integrate Our SDK</h3>
-              <p className="text-gray-600">
-                Install our Python or TypeScript SDK and add your API key. Start processing
-                payments, creating subscriptions, and tracking usage in just 5 lines of code.
-              </p>
-            </div>
-
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-              <div className="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center mb-4">
-                <span className="text-2xl font-bold text-pink-600">3</span>
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">We Collect Fees</h3>
-              <p className="text-gray-600">
-                For every payment your AI agent processes, we automatically capture our platform
-                fee (2% of transaction OR $0.05 per call, whichever is less). You keep the rest.
-              </p>
-            </div>
+            ))}
           </div>
-        </section>
-
-        {/* Pricing Model Explained */}
-        <section className="mb-16 bg-amber-50 border-2 border-amber-200 rounded-xl p-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">💰 Pricing Model Explained</h2>
-          <div className="space-y-4 text-gray-700">
-            <p className="text-lg font-semibold">You pay SwiftAPI in two ways:</p>
-
-            <div className="bg-white p-6 rounded-lg border border-amber-200">
-              <h3 className="text-xl font-bold text-gray-900 mb-3">1. Monthly Subscription</h3>
-              <p className="mb-2">Based on your API call volume:</p>
-              <ul className="space-y-2 ml-6">
-                <li className="flex items-start">
-                  <span className="text-primary-600 mr-2">•</span>
-                  <span><strong>Free:</strong> $0/month for 1,000 API calls</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-primary-600 mr-2">•</span>
-                  <span><strong>Indie:</strong> $49/month for 10,000 API calls</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-primary-600 mr-2">•</span>
-                  <span><strong>Pro:</strong> $199/month for 100,000 API calls</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-primary-600 mr-2">•</span>
-                  <span><strong>Enterprise:</strong> $999/month for unlimited API calls</span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg border border-amber-200">
-              <h3 className="text-xl font-bold text-gray-900 mb-3">2. Transaction Fees</h3>
-              <p className="mb-3">For every payment processed through SwiftAPI:</p>
-              <div className="bg-amber-50 p-4 rounded-lg border border-amber-300 mb-3">
-                <p className="text-lg font-bold text-gray-900">
-                  2% of transaction amount OR $0.05 per API call (whichever is less)
-                </p>
-              </div>
-
-              <div className="space-y-3">
-                <div>
-                  <p className="font-semibold text-gray-900 mb-1">Example 1: Large Transaction</p>
-                  <p className="text-sm">Your user pays $1,000 through your AI agent</p>
-                  <ul className="text-sm ml-4 mt-1 space-y-1">
-                    <li>→ 2% fee = $20</li>
-                    <li>→ Per-call fee = $0.05</li>
-                    <li className="font-semibold text-primary-600">→ We charge: $0.05 (the lesser amount)</li>
-                    <li className="font-semibold text-green-600">→ You receive: $999.95</li>
-                  </ul>
-                </div>
-
-                <div>
-                  <p className="font-semibold text-gray-900 mb-1">Example 2: Small Transaction</p>
-                  <p className="text-sm">Your user pays $2 through your AI agent</p>
-                  <ul className="text-sm ml-4 mt-1 space-y-1">
-                    <li>→ 2% fee = $0.04</li>
-                    <li>→ Per-call fee = $0.05</li>
-                    <li className="font-semibold text-primary-600">→ We charge: $0.04 (the lesser amount)</li>
-                    <li className="font-semibold text-green-600">→ You receive: $1.96</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-primary-50 p-4 rounded-lg border border-primary-200">
-              <p className="font-semibold text-gray-900">
-                💡 This means SwiftAPI is extremely cost-effective for high-volume applications
-                while still being profitable for low-volume use cases.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Quick Start */}
-        <section className="mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">Quick Start Guides</h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            <Link href="/docs/getting-started" className="group">
-              <div className="bg-white p-6 rounded-xl shadow-sm border-2 border-gray-200 hover:border-primary-500 transition">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-primary-600 transition">
-                  Getting Started →
-                </h3>
-                <p className="text-gray-600">
-                  Create your account, get your API key, and make your first request in 5 minutes.
-                </p>
-              </div>
-            </Link>
-
-            <Link href="/docs/integration" className="group">
-              <div className="bg-white p-6 rounded-xl shadow-sm border-2 border-gray-200 hover:border-primary-500 transition">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-primary-600 transition">
-                  Integration Guide →
-                </h3>
-                <p className="text-gray-600">
-                  Step-by-step guide to integrate SwiftAPI into your AI agent application.
-                </p>
-              </div>
-            </Link>
-
-            <Link href="/docs/sdk/python" className="group">
-              <div className="bg-white p-6 rounded-xl shadow-sm border-2 border-gray-200 hover:border-primary-500 transition">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-primary-600 transition">
-                  Python SDK →
-                </h3>
-                <p className="text-gray-600">
-                  Complete reference for the SwiftAPI Python SDK with examples and best practices.
-                </p>
-              </div>
-            </Link>
-
-            <Link href="/docs/sdk/typescript" className="group">
-              <div className="bg-white p-6 rounded-xl shadow-sm border-2 border-gray-200 hover:border-primary-500 transition">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-primary-600 transition">
-                  TypeScript SDK →
-                </h3>
-                <p className="text-gray-600">
-                  Complete reference for the SwiftAPI TypeScript SDK with full type definitions.
-                </p>
-              </div>
-            </Link>
-          </div>
-        </section>
-
-        {/* Core Features */}
-        <section className="mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">Core Features</h2>
-          <div className="space-y-4">
-            <details className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-              <summary className="text-xl font-semibold text-gray-900 cursor-pointer">
-                Payment Processing
-              </summary>
-              <div className="mt-4 text-gray-700 space-y-2">
-                <p>Accept payments from your AI agent users using Stripe infrastructure:</p>
-                <ul className="list-disc ml-6 space-y-1">
-                  <li>Credit card payments (Visa, Mastercard, Amex, etc.)</li>
-                  <li>ACH bank transfers</li>
-                  <li>International payment methods</li>
-                  <li>Automatic fee capture (2% or $0.05/call)</li>
-                  <li>Instant payouts to your bank account</li>
-                  <li>Full payment history and receipts</li>
-                </ul>
-              </div>
-            </details>
-
-            <details className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-              <summary className="text-xl font-semibold text-gray-900 cursor-pointer">
-                Subscription Management
-              </summary>
-              <div className="mt-4 text-gray-700 space-y-2">
-                <p>Create and manage recurring subscriptions for your users:</p>
-                <ul className="list-disc ml-6 space-y-1">
-                  <li>Monthly and annual billing cycles</li>
-                  <li>Automatic proration on upgrades/downgrades</li>
-                  <li>Trial periods and promotional pricing</li>
-                  <li>Subscription lifecycle management (active, paused, cancelled)</li>
-                  <li>Dunning management for failed payments</li>
-                  <li>Customer portal for self-service</li>
-                </ul>
-              </div>
-            </details>
-
-            <details className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-              <summary className="text-xl font-semibold text-gray-900 cursor-pointer">
-                API Key Authentication
-              </summary>
-              <div className="mt-4 text-gray-700 space-y-2">
-                <p>Secure API access with industry-standard authentication:</p>
-                <ul className="list-disc ml-6 space-y-1">
-                  <li>JWT tokens for user sessions</li>
-                  <li>API keys for server-to-server communication</li>
-                  <li>Rotating secrets and key revocation</li>
-                  <li>Per-key usage tracking</li>
-                  <li>IP whitelisting (Enterprise)</li>
-                  <li>Webhook signature verification</li>
-                </ul>
-              </div>
-            </details>
-
-            <details className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-              <summary className="text-xl font-semibold text-gray-900 cursor-pointer">
-                Usage Tracking & Analytics
-              </summary>
-              <div className="mt-4 text-gray-700 space-y-2">
-                <p>Monitor and analyze your AI agent's performance:</p>
-                <ul className="list-disc ml-6 space-y-1">
-                  <li>Real-time API call counting</li>
-                  <li>Per-user usage breakdown</li>
-                  <li>Rate limiting by tier (10-5000 req/min)</li>
-                  <li>Historical usage reports</li>
-                  <li>Revenue analytics dashboard</li>
-                  <li>Export data to CSV/JSON</li>
-                </ul>
-              </div>
-            </details>
-          </div>
-        </section>
-
-        {/* Use Cases */}
-        <section className="mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">Common Use Cases</h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">AI-Powered SaaS</h3>
-              <p className="text-gray-600 mb-3">
-                Build a subscription-based AI tool and let SwiftAPI handle billing, usage metering, and payments.
-              </p>
-              <code className="text-sm bg-gray-50 p-2 rounded block">
-                client.create_subscription("pro", user_id)
-              </code>
-            </div>
-
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">Pay-Per-Use AI Agents</h3>
-              <p className="text-gray-600 mb-3">
-                Charge users per AI interaction, image generation, or analysis request.
-              </p>
-              <code className="text-sm bg-gray-50 p-2 rounded block">
-                client.create_payment(9.99, metadata={'{'}...{'}'})
-              </code>
-            </div>
-
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">API Marketplace</h3>
-              <p className="text-gray-600 mb-3">
-                Create a marketplace of AI capabilities where each API call is metered and billed.
-              </p>
-              <code className="text-sm bg-gray-50 p-2 rounded block">
-                usage = client.get_usage()
-              </code>
-            </div>
-
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">White-Label AI Platform</h3>
-              <p className="text-gray-600 mb-3">
-                Build AI infrastructure for other companies and handle multi-tenant billing.
-              </p>
-              <code className="text-sm bg-gray-50 p-2 rounded block">
-                client.create_api_key(customer_id)
-              </code>
-            </div>
-          </div>
-        </section>
-
-        {/* Support */}
-        <section className="bg-gray-100 rounded-xl p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Need Help?</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-2">Community Support</h3>
-              <p className="text-gray-600 text-sm mb-3">Free tier users can ask questions on GitHub Discussions.</p>
-              <a href="https://github.com/theonlypal/swiftapi/discussions" className="text-primary-600 hover:text-primary-700 text-sm font-medium">
-                Visit GitHub →
-              </a>
-            </div>
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-2">Email Support</h3>
-              <p className="text-gray-600 text-sm mb-3">Indie and Pro users get 24-48 hour email support.</p>
-              <a href="mailto:support@getswiftapi.com" className="text-primary-600 hover:text-primary-700 text-sm font-medium">
-                support@getswiftapi.com →
-              </a>
-            </div>
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-2">Priority Support</h3>
-              <p className="text-gray-600 text-sm mb-3">Enterprise users get dedicated support and phone access.</p>
-              <Link href="/signup" className="text-primary-600 hover:text-primary-700 text-sm font-medium">
-                Upgrade to Enterprise →
-              </Link>
-            </div>
-          </div>
-        </section>
+        </div>
       </div>
     </div>
   );
