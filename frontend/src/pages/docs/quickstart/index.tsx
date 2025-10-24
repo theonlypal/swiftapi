@@ -170,7 +170,7 @@ print(payment)
             Step 4: Authenticate
           </h2>
           <CodeBlock
-            language={activeLanguage.toLowerCase()}
+            language={activeLanguage.toLowerCase() as 'python' | 'typescript' | 'curl'}
             code={authExamples[activeLanguage]}
           />
         </section>
