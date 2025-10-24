@@ -180,7 +180,7 @@ print(payment)
             Step 5: Make First Payment
           </h2>
           <CodeBlock
-            language={activeLanguage.toLowerCase()}
+            language={activeLanguage.toLowerCase() as 'python' | 'typescript' | 'curl'}
             code={paymentExamples[activeLanguage]}
           />
           <div className="bg-green-50 p-4 rounded-lg mt-4">
