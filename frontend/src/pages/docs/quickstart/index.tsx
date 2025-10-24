@@ -146,7 +146,7 @@ print(payment)
             Step 2: Get API Key
           </h2>
           <p className="mb-4">
-            After creating your account, navigate to the Dashboard > API Keys
+            After creating your account, navigate to the Dashboard {'->'} API Keys
             section to generate your first API key.
           </p>
           <div className="bg-gray-100 p-4 rounded-lg">
