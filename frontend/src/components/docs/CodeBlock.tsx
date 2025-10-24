@@ -11,13 +11,13 @@ const languageIcons = {
 
 interface CodeBlockProps {
   title?: string;
-  code: {
+  code: string | {
     python?: string;
     typescript?: string;
     curl?: string;
   };
   showLineNumbers?: boolean;
-  language?: 'python' | 'typescript' | 'curl';
+  language?: 'python' | 'typescript' | 'curl' | 'bash' | 'json';
 }
 
 export const CodeBlock: React.FC<CodeBlockProps> = ({
@@ -26,11 +26,11 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
   showLineNumbers = false,
   language = 'typescript'
 }) => {
-  const [activeLanguage, setActiveLanguage] = useState<keyof typeof code>(language);
+  const [activeLanguage, setActiveLanguage] = useState<string>(language);
   const [copied, setCopied] = useState(false);
 
   // Safely get the code for the active language
-  const currentCode = code[activeLanguage] || '';
+  const currentCode = typeof code === 'string' ? code : (code[activeLanguage as keyof typeof code] || '');
 
   // Copy to clipboard handler
   const handleCopy = useCallback(() => {
@@ -50,12 +50,12 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
       )}
 
       {/* Language Tabs */}
-      {Object.keys(code).length > 1 && (
+      {typeof code === 'object' && Object.keys(code).length > 1 && (
         <div className="flex bg-gray-800 px-4 pt-2">
           {(Object.keys(code) as Array<keyof typeof code>).map((lang) => (
             <button
               key={lang}
-              onClick={() => setActiveLanguage(lang)}
+              onClick={() => setActiveLanguage(lang as string)}
               className={`
                 px-3 py-1 rounded-t-md mr-2 text-sm flex items-center
                 ${activeLanguage === lang
@@ -64,8 +64,8 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
               `}
               aria-label={`Switch to ${lang} code`}
             >
-              <span className="mr-2">{languageIcons[lang]}</span>
-              {lang.charAt(0).toUpperCase() + lang.slice(1)}
+              <span className="mr-2">{languageIcons[lang as keyof typeof languageIcons]}</span>
+              {String(lang).charAt(0).toUpperCase() + String(lang).slice(1)}
             </button>
           ))}
         </div>
