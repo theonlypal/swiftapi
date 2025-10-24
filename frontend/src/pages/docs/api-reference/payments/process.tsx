@@ -1,6 +1,5 @@
 import React from 'react';
-import CodeBlock from '@/components/CodeBlock';
-import ApiReference from '@/components/ApiReference';
+import CodeBlock from '@/components/docs/CodeBlock';
 
 export default function PaymentsApiReference() {
   const requestParameters = [

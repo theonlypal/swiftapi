@@ -1,12 +1,14 @@
 import React from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
-import { CodeBlock } from '@/components/CodeBlock';
-import { DocumentationLayout } from '@/components/DocumentationLayout';
+import CodeBlock from '@/components/docs/CodeBlock';
+import { Inter } from 'next/font/google';
+
+const inter = Inter({ subsets: ['latin'] });
 
 export default function PythonSDKDocumentation() {
   return (
-    <DocumentationLayout>
+    <div className={inter.className}>
       <Head>
         <title>Swift API - Python SDK Documentation</title>
         <meta name="description" content="Comprehensive guide to using the Swift API Python SDK" />
@@ -209,6 +211,6 @@ client = SwiftAPI(
           </p>
         </section>
       </div>
-    </DocumentationLayout>
+    </div>
   );
 }

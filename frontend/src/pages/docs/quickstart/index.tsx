@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { Inter } from 'next/font/google';
-import CodeBlock from '@/components/CodeBlock';
+import CodeBlock from '@/components/docs/CodeBlock';
 
 const inter = Inter({ subsets: ['latin'] });
 
