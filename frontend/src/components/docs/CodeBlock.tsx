@@ -1,6 +1,17 @@
 import React, { useState, useCallback } from 'react';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { Light as SyntaxHighlighter } from 'react-syntax-highlighter';
+import python from 'react-syntax-highlighter/dist/esm/languages/hljs/python';
+import typescript from 'react-syntax-highlighter/dist/esm/languages/hljs/typescript';
+import bash from 'react-syntax-highlighter/dist/esm/languages/hljs/bash';
+import json from 'react-syntax-highlighter/dist/esm/languages/hljs/json';
+import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+
+// Register languages
+SyntaxHighlighter.registerLanguage('python', python);
+SyntaxHighlighter.registerLanguage('typescript', typescript);
+SyntaxHighlighter.registerLanguage('bash', bash);
+SyntaxHighlighter.registerLanguage('json', json);
+SyntaxHighlighter.registerLanguage('curl', bash); // Use bash highlighting for curl
 
 // Language icons (you can replace these with actual SVG icons or import from an icon library)
 const languageIcons = {
@@ -95,7 +106,7 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
         {/* Syntax Highlighter */}
         <SyntaxHighlighter
           language={activeLanguage}
-          style={oneDark}
+          style={docco}
           showLineNumbers={showLineNumbers}
           customStyle={{
             margin: 0,
