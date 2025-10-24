@@ -11,11 +11,12 @@ const languageIcons = {
 
 interface CodeBlockProps {
   title?: string;
-  code: string | {
+  code?: string | {
     python?: string;
     typescript?: string;
     curl?: string;
   };
+  children?: string;
   showLineNumbers?: boolean;
   language?: 'python' | 'typescript' | 'curl' | 'bash' | 'json';
 }
@@ -23,6 +24,7 @@ interface CodeBlockProps {
 export const CodeBlock: React.FC<CodeBlockProps> = ({
   title,
   code,
+  children,
   showLineNumbers = false,
   language = 'typescript'
 }) => {
@@ -30,7 +32,8 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
   const [copied, setCopied] = useState(false);
 
   // Safely get the code for the active language
-  const currentCode = typeof code === 'string' ? code : (code[activeLanguage as keyof typeof code] || '');
+  const codeContent = children || code;
+  const currentCode = typeof codeContent === 'string' ? codeContent : (codeContent?.[activeLanguage as keyof typeof codeContent] || '');
 
   // Copy to clipboard handler
   const handleCopy = useCallback(() => {
@@ -50,9 +53,9 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
       )}
 
       {/* Language Tabs */}
-      {typeof code === 'object' && Object.keys(code).length > 1 && (
+      {typeof codeContent === 'object' && codeContent && Object.keys(codeContent).length > 1 && (
         <div className="flex bg-gray-800 px-4 pt-2">
-          {(Object.keys(code) as Array<keyof typeof code>).map((lang) => (
+          {(Object.keys(codeContent) as Array<keyof typeof codeContent>).map((lang) => (
             <button
               key={lang}
               onClick={() => setActiveLanguage(lang as string)}
